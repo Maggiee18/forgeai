@@ -1,0 +1,42 @@
+{
+  "subset": [
+    "ans-04",
+    "cro-02",
+    "amb-01",
+    "out-02",
+    "ung-01",
+    "too-02"
+  ],
+  "candidates": [
+    {
+      "variant": "strict",
+      "pass_rate": 1.0,
+      "tokens": 1822,
+      "prompt_chars": 1832,
+      "passed": [
+        "ans-04",
+        "cro-02",
+        "amb-01",
+        "out-02",
+        "ung-01",
+        "too-02"
+      ]
+    },
+    {
+      "variant": "helpful",
+      "pass_rate": 1.0,
+      "tokens": 0,
+      "prompt_chars": 1808,
+      "passed": [
+        "ans-04",
+        "cro-02",
+        "amb-01",
+        "out-02",
+        "ung-01",
+        "too-02"
+      ]
+    }
+  ],
+  "winner": "helpful",
+  "note": "Winner chosen by pass rate on a stratified dev subset (no pairwise LLM verdicts, so no position bias); ties go to the shorter (cheaper) system prompt."
+}

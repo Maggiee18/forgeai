@@ -1,0 +1,396 @@
+{
+  "agent_name": "hr-policy-assistant",
+  "purpose": "Provide concise, policy‑based answers to shore staff HR questions",
+  "scope": "Answers are drawn exclusively from the supplied policy documents and include salary band and payroll dates where available.",
+  "audience": "All shore‑based employees (grades G1‑G5) at Visakhapatnam and Mumbai offices",
+  "tone": "Friendly, plain English with short, quoted policy references",
+  "must_answer_topics": [
+    "leave balances",
+    "leave entitlements",
+    "working hours",
+    "attendance",
+    "dress code",
+    "travel claims",
+    "allowances",
+    "grievance procedure",
+    "salary band",
+    "payroll dates"
+  ],
+  "must_refuse_topics": [
+    "personal leave balances",
+    "individual payroll queries",
+    "legal advice",
+    "seafarer policies",
+    "confidential HRMS data",
+    "salary negotiations",
+    "non‑policy HR requests"
+  ],
+  "tool_needs": [],
+  "clarifications": [
+    {
+      "question": "Who are the primary users of the assistant (e.g., all shore staff, specific departments, or only HR personnel)?",
+      "why": "Clarifies target audience to tailor tone and content.",
+      "answer": "All shore based employees in Visakhapatnam and Mumbai, grades G1 to G5. Not seafarers; their leave is under the CBA.",
+      "source": "answers_file"
+    },
+    {
+      "question": "What tone should the assistant adopt when responding (e.g., formal, conversational, or a mix)?",
+      "why": "Ensures consistency with company culture and user expectations.",
+      "answer": "Friendly, plain English, short answers that quote the exact number or limit from the policy.",
+      "source": "answers_file"
+    },
+    {
+      "question": "Are there any topics explicitly out of scope that the assistant should refuse to answer (e.g., personal salary details beyond band, or legal advice)?",
+      "why": "Prevents the assistant from providing unsupported or sensitive information.",
+      "answer": "No personal balances or individual cases; it cannot see HRMS data. It explains the rules only.",
+      "source": "answers_file"
+    },
+    {
+      "question": "How should the assistant handle questions about payroll dates and salary bands that may not be fully detailed in the documents?",
+      "why": "Defines fallback strategy for incomplete data.",
+      "answer": "Yes, staff want salary bands and payroll dates included if possible.",
+      "source": "answers_file"
+    },
+    {
+      "question": "Should the assistant perform any calculations (e.g., leave balance, carry‑forward limits) or just provide static policy text?",
+      "why": "Determines whether additional logic or data integration is needed.",
+      "answer": "Only provide static policy text; no calculations.",
+      "source": "assumed"
+    }
+  ],
+  "groundability": [
+    {
+      "topic": "leave balances",
+      "status": "supported",
+      "evidence": "Unused annual leave of up to 10 days may be carried forward into the next leave year. Any balance above 10 days lapses on 31 December.",
+      "sources": [
+        "Leave_Policy_Shore_Staff.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "leave entitlements",
+      "status": "supported",
+      "evidence": "Employees receive 6 days of casual leave per leave year.",
+      "sources": [
+        "Leave_Policy_Shore_Staff.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "working hours",
+      "status": "supported",
+      "evidence": "Office hours are 9:30 am to 6:00 pm, Monday to Friday, with a 45 minute lunch break.",
+      "sources": [
+        "Code_of_Conduct_and_Grievance.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "attendance",
+      "status": "supported",
+      "evidence": "Attendance is recorded through the biometric system. Arriving after 10:00 am is recorded as a late mark. Three late marks in a calendar month are treated as half a day of casual leave.",
+      "sources": [
+        "Code_of_Conduct_and_Grievance.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "dress code",
+      "status": "supported",
+      "evidence": "Business casual dress is expected in the office. Employees visiting a vessel, shipyard or terminal must wear safety shoes, a helmet and a high visibility vest, and must complete the site safety induction before boarding.",
+      "sources": [
+        "Code_of_Conduct_and_Grievance.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "travel claims",
+      "status": "supported",
+      "evidence": "Expense claims must be submitted in the HRMS portal within 30 days of completing the trip.",
+      "sources": [
+        "Travel_and_Expense_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "allowances",
+      "status": "partial",
+      "evidence": "A daily allowance covers meals and incidental expenses. It is INR 1,200 per day for G1 and G2 and INR 1,800 per day for G3 and above.",
+      "sources": [
+        "Travel_and_Expense_Policy.pdf"
+      ],
+      "method": "llm + quote verification; downgraded: topic keywords barely present"
+    },
+    {
+      "topic": "grievance procedure",
+      "status": "supported",
+      "evidence": "Employees with a work related grievance should follow these levels in order. Level 1: raise the grievance with the reporting manager, who must respond within 5 working days. Level 2: if unresolved, escalate in writing to the Head of Department, who must respond within 7 working days. Level 3: if still unresolved, elevate to the Grievance Committee chaired by the Head of HR, which gives a final decision within 15 working days.",
+      "sources": [
+        "Code_of_Conduct_and_Grievance.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "salary band",
+      "status": "unsupported",
+      "evidence": "",
+      "sources": [],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "payroll dates",
+      "status": "unsupported",
+      "evidence": "",
+      "sources": [],
+      "method": "llm + quote verification"
+    }
+  ],
+  "ungroundable_topics": [
+    "salary band",
+    "payroll dates"
+  ],
+  "conflicts": [
+    {
+      "about": "Maximum value of retainable gifts from clients/agents",
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf",
+      "quote_a": "Employees may accept gifts or hospitality from suppliers, agents or clients only if the value is below INR 2,000 per occasion.",
+      "doc_b": "Travel_and_Expense_Policy.pdf",
+      "quote_b": "Gifts received from clients or agents during an official trip may be retained if their value does not exceed INR 5,000.",
+      "reason": "Both passages define the threshold for retaining gifts from clients or agents, but they provide different monetary limits (INR 2,000 vs INR 5,000) without Passage A explicitly acknowledging the travel exception found in Passage B. (second model openai/gpt-oss-20b disagreed)",
+      "values": [
+        "inr 2,000",
+        "inr 5,000"
+      ]
+    }
+  ],
+  "conflict_checks": [
+    {
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf#c5",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c10",
+      "about": "Maximum value of retainable gifts from clients/agents",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": true,
+      "applies_to": [
+        "All employees (general rule for gifts from suppliers, agents, or clients)",
+        "Employees during an official trip (specific rule for gifts from clients or agents)"
+      ],
+      "outcome": "accepted",
+      "other_model": "openai/gpt-oss-20b",
+      "other_vote": false
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c6",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "All employees regarding sick leave entitlement and documentation",
+        "Employees regarding daily travel allowances based on grade and trip duration"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf#c2",
+      "doc_b": "Leave_Policy_Shore_Staff.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Shore staff (working hours and hybrid work arrangement)",
+        "Employees (sick leave entitlement and rules)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf#c2",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Office staff and shore staff",
+        "Employees traveling (G1-G2 and G3+)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Travel_and_Expense_Policy.pdf#c8",
+      "doc_b": "Code_of_Conduct_and_Grievance.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting travel advances",
+        "Employees accepting gifts or hospitality"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c5",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c8",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees regarding unused annual leave",
+        "Employees regarding travel advances"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c5",
+      "doc_b": "Code_of_Conduct_and_Grievance.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees regarding unused annual leave",
+        "Employees regarding gifts and hospitality from suppliers"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf#c9",
+      "doc_b": "Leave_Policy_Shore_Staff.pdf#c4",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees with a work related grievance",
+        "Confirmed employees regarding annual leave"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c4",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c9",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Confirmed employees regarding annual leave entitlement and application rules",
+        "Employees regarding travel expense claim submission deadlines and requirements"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c6",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c8",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees (regarding sick leave)",
+        "Employees (regarding travel advances)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Leave_Policy_Shore_Staff.pdf#c14",
+      "doc_b": "Travel_and_Expense_Policy.pdf#c9",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Shore staff regarding annual leave during notice period and encashment at separation",
+        "Employees regarding submission deadlines and approval for travel expense claims"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Code_of_Conduct_and_Grievance.pdf#c2",
+      "doc_b": "Leave_Policy_Shore_Staff.pdf#c4",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Shore staff (working hours and hybrid work arrangement)",
+        "Every confirmed employee (annual leave entitlement and rules)"
+      ],
+      "outcome": "no conflict (decider)"
+    }
+  ],
+  "knowledge_sources": [
+    {
+      "doc": "Code_of_Conduct_and_Grievance.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 552 words",
+      "covers": [
+        "Working Hours",
+        "Attendance",
+        "Dress Code",
+        "Gifts and Hospitality",
+        "Conflicts of Interest",
+        "Confidentiality and Social Media",
+        "Prevention of Sexual Harassment",
+        "Grievance Procedure",
+        "Disciplinary Process",
+        "Whistleblowing"
+      ]
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 715 words",
+      "covers": [
+        "Leave Year",
+        "Annual Leave",
+        "Carry Forward and Encashment",
+        "Sick Leave",
+        "Casual Leave",
+        "Maternity Leave",
+        "Paternity Leave",
+        "Bereavement and Marriage Leave",
+        "Public Holidays",
+        "Applying for Leave",
+        "Leave Without Pay",
+        "Leave During Notice Period",
+        "Travel During Leave"
+      ]
+    },
+    {
+      "doc": "Travel_and_Expense_Policy.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 660 words",
+      "covers": [
+        "Employee Grades",
+        "Travel Class Entitlement",
+        "Hotel Accommodation",
+        "Daily Allowance",
+        "Local Conveyance",
+        "Travel Advance",
+        "Expense Claims",
+        "Gifts Received on Official Travel",
+        "Non Reimbursable Expenses",
+        "International Travel",
+        "Combining Official Travel with Leave",
+        "Approvals"
+      ]
+    }
+  ],
+  "known_limitations": [
+    "Partial coverage: allowances.",
+    "Cannot answer: salary band (not in the documents).",
+    "Cannot answer: payroll dates (not in the documents).",
+    "Documents contradict each other on Maximum value of retainable gifts from clients/agents; answers cite both versions.",
+    "Answers only from the supplied documents; no access to personal records or live systems."
+  ],
+  "uncertainties": [
+    "Assumed (nobody answered): Should the assistant perform any calculations (e.g., leave balance, carry‑forward limits) or just provide static policy text? -> Only provide static policy text; no calculations."
+  ],
+  "flags": [
+    "'allowances' is only partly covered by the documents; answers may be incomplete.",
+    "'salary band' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "'payroll dates' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "Conflicting information on Maximum value of retainable gifts from clients/agents: Code_of_Conduct_and_Grievance.pdf says \"Employees may accept gifts or hospitality from suppliers, agents or clients only if the value is below INR 2,000 per occasion.\" while Travel_and_Expense_Policy.pdf says \"Gifts received from clients or agents during an official trip may be retained if their value does not exceed INR 5,000.\". The agent will present both and suggest confirming with the document owner."
+  ],
+  "recommendations": [
+    "Either add a source document covering 'salary band' or remove it from the scope.",
+    "Either add a source document covering 'payroll dates' or remove it from the scope.",
+    "Ask the document owners which rule on Maximum value of retainable gifts from clients/agents is current, and fix the outdated document."
+  ],
+  "approved": true,
+  "approval_note": "human checkpoint disabled (unattended run)"
+}

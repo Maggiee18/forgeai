@@ -1,0 +1,41 @@
+part_number,description,equipment,maker,unit,unit_price_usd,stock_on_hand,lead_time_days,min_order_qty,supplier
+ME-FI-1021,Fuel injection valve nozzle,Main engine,MAN B&W,pc,412.50,6,21,2,Poseidon Marine Supplies
+ME-FI-1022,Fuel injection valve complete,Main engine,MAN B&W,pc,2860.00,2,35,1,Poseidon Marine Supplies
+ME-PR-2040,Piston ring set (top ring CPR),Main engine,MAN B&W,set,1945.00,3,42,1,Poseidon Marine Supplies
+ME-CL-2110,Cylinder liner O-ring kit,Main engine,MAN B&W,kit,286.00,10,14,2,Harbourline Spares
+ME-EV-3005,Exhaust valve spindle,Main engine,MAN B&W,pc,6420.00,1,63,1,Poseidon Marine Supplies
+ME-EV-3006,Exhaust valve seat ring,Main engine,MAN B&W,pc,1380.00,2,49,1,Poseidon Marine Supplies
+ME-TC-4100,Turbocharger nozzle ring,Main engine,ABB,pc,8950.00,0,70,1,Harbourline Spares
+ME-TC-4105,Turbocharger bearing set,Main engine,ABB,set,3175.00,1,45,1,Harbourline Spares
+AE-FP-5010,Fuel pump plunger and barrel,Auxiliary engine,Yanmar,pc,735.00,4,28,2,Harbourline Spares
+AE-CH-5022,Cylinder head gasket,Auxiliary engine,Yanmar,pc,64.00,24,10,6,Harbourline Spares
+AE-PS-5031,Piston complete with rings,Auxiliary engine,Yanmar,pc,2210.00,2,38,1,Poseidon Marine Supplies
+AE-TB-5040,Thermostat element,Auxiliary engine,Yanmar,pc,118.00,8,12,4,Harbourline Spares
+AE-LF-5050,Lube oil filter cartridge,Auxiliary engine,Yanmar,pc,42.00,60,7,12,Harbourline Spares
+AE-FF-5051,Fuel oil filter element,Auxiliary engine,Yanmar,pc,38.00,48,7,12,Harbourline Spares
+PU-BS-6001,Purifier bowl seal ring kit,Fuel oil purifier,Alfa Laval,kit,195.00,6,18,2,Poseidon Marine Supplies
+PU-MS-6002,Purifier major service kit,Fuel oil purifier,Alfa Laval,kit,1640.00,1,30,1,Poseidon Marine Supplies
+PU-GW-6010,Purifier gravity disc set,Fuel oil purifier,Alfa Laval,set,310.00,2,21,1,Poseidon Marine Supplies
+PM-MS-7001,Mechanical seal 45 mm,Sea water cooling pump,Shinko,pc,520.00,3,25,1,Harbourline Spares
+PM-IM-7002,Impeller bronze,Sea water cooling pump,Shinko,pc,1185.00,1,40,1,Harbourline Spares
+PM-BR-7003,Ball bearing 6312 C3,Sea water cooling pump,SKF,pc,48.00,16,5,4,Harbourline Spares
+PM-MS-7101,Mechanical seal 35 mm,Ballast pump,Naniwa,pc,465.00,2,25,1,Harbourline Spares
+PM-WR-7102,Wear ring set,Ballast pump,Naniwa,set,270.00,4,20,1,Harbourline Spares
+AC-VK-8001,Valve kit low pressure stage,Main air compressor,Sperre,kit,690.00,3,24,1,Poseidon Marine Supplies
+AC-VK-8002,Valve kit high pressure stage,Main air compressor,Sperre,kit,845.00,2,24,1,Poseidon Marine Supplies
+AC-PR-8010,Piston ring set compressor,Main air compressor,Sperre,set,215.00,5,18,1,Poseidon Marine Supplies
+AC-UL-8020,Unloader valve assembly,Main air compressor,Sperre,pc,560.00,0,32,1,Poseidon Marine Supplies
+BL-BN-9001,Burner nozzle tip,Auxiliary boiler,Aalborg,pc,155.00,6,15,2,Harbourline Spares
+BL-IG-9002,Ignition electrode set,Auxiliary boiler,Aalborg,set,98.00,4,15,2,Harbourline Spares
+BL-GG-9010,Water level gauge glass,Auxiliary boiler,Klinger,pc,72.00,10,9,4,Harbourline Spares
+BL-SV-9020,Safety valve spring,Auxiliary boiler,Aalborg,pc,240.00,2,28,1,Poseidon Marine Supplies
+SG-HS-1101,Hydraulic seal kit steering ram,Steering gear,Rolls-Royce,kit,1320.00,1,35,1,Poseidon Marine Supplies
+SG-PF-1102,Steering pump filter element,Steering gear,Rolls-Royce,pc,88.00,6,10,2,Poseidon Marine Supplies
+DK-WB-1201,Windlass brake lining set,Deck machinery,TTS,set,960.00,1,30,1,Harbourline Spares
+DK-HM-1202,Hydraulic motor seal kit,Deck machinery,TTS,kit,410.00,2,26,1,Harbourline Spares
+DK-WR-1210,Mooring winch wire rope 36 mm x 220 m,Deck machinery,Bridon,coil,4850.00,1,56,1,Harbourline Spares
+SF-FE-1301,Fire extinguisher CO2 6 kg,Safety equipment,Minimax,pc,145.00,12,8,4,Poseidon Marine Supplies
+SF-BA-1302,Breathing apparatus cylinder 6.8 L,Safety equipment,Drager,pc,610.00,4,20,2,Poseidon Marine Supplies
+SF-LJ-1303,Lifejacket SOLAS adult,Safety equipment,Viking,pc,52.00,40,6,10,Poseidon Marine Supplies
+SF-ID-1310,Immersion suit SOLAS,Safety equipment,Viking,pc,385.00,6,12,2,Poseidon Marine Supplies
+SF-FD-1320,Fire detector smoke optical,Safety equipment,Consilium,pc,128.00,10,14,5,Harbourline Spares

@@ -1,0 +1,26 @@
+# Copy to forgeai.yaml. Env vars (FORGE_BACKEND, FORGE_MODEL, FORGE_JUDGE_MODEL, FORGE_EMBEDDING, GROQ_API_KEY ...)
+# and CLI flags override this file. The API key itself always comes from the environment, never this file.
+
+# --- hosted small open models (used for the committed demo runs) ---
+backend: groq
+model: openai/gpt-oss-20b            # factory + agent: open weights, 21B MoE with 3.6B active parameters
+judge_model: qwen/qwen3.8-27b        # different model family from the agent -> less self preference
+
+# --- fully local (offline review day) ---
+# backend: ollama
+# model: qwen2.5:7b-instruct
+# judge_model: llama3.1:8b
+
+embedding: wordllama                 # offline, bundled in the pip package; or fastembed:BAAI/bge-small-en-v1.5
+max_iterations: 3
+min_gain: 0.02
+max_tokens: 600000
+tournament: true
+tournament_cases: 10
+human_checkpoint: false
+n_answerable: 10
+n_cross_doc: 4
+n_ambiguous: 4
+n_out_of_scope: 5
+n_tool: 3
+holdout_fraction: 0.3

@@ -1,0 +1,13 @@
+pypdf>=4.0
+pydantic>=2.5
+pyyaml>=6.0
+requests>=2.31
+reportlab>=4.0      # only for synthesis/build_docs.py
+pytest>=8.0         # tests
+numpy>=1.26
+wordllama>=0.4
+# fastembed>=0.4   # optional: better embeddings (bge), downloads model from Hugging Face
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+httpx>=0.27          # tests (FastAPI TestClient)

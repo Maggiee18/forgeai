@@ -1,0 +1,58 @@
+[
+  {
+    "iteration": 1,
+    "from_version": 0,
+    "to_version": 1,
+    "dev_before": 0.889,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 1
+    },
+    "changes": [
+      {
+        "category": "wrong_refusal",
+        "target": "prompt.refusal",
+        "before": "Refuse personal advice, non‑procurement, legal, financial planning beyond scope, non‑maritime, supplier‑unrelated, or unverified external questions. For not groundable freight quote, say it cannot be answered. Offer to direct the user to the document author or designated contact if named.\nThe documents do NOT cover the following, so never answer them from memory; say they are not covered and set refused to true: freight quote.",
+        "after": "Refuse personal advice, non‑procurement, legal, financial planning beyond scope, non‑maritime, supplier‑unrelated, or unverified external questions. For any request that requires a freight quote or other data not present in the provided excerpts, state that the information is not covered and set refused to true. If the user asks for a specific number of quotes or details not in the excerpts, refuse and suggest consulting the document author or designated contact. Do not provide any answer based on memory or external sources.",
+        "rationale": "Adds explicit rule to refuse when freight quote details are missing, preventing over‑refusal of valid excerpted information.",
+        "addressed_cases": [
+          "amb-03"
+        ],
+        "fixed_cases": []
+      }
+    ],
+    "newly_broken": [],
+    "newly_fixed": [],
+    "dev_after": 0.889,
+    "holdout_after": 1.0,
+    "decision": "reverted (dev score did not improve)"
+  },
+  {
+    "iteration": 2,
+    "from_version": 0,
+    "to_version": 2,
+    "dev_before": 0.889,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 1
+    },
+    "changes": [
+      {
+        "category": "wrong_refusal",
+        "target": "-",
+        "skipped": "an earlier fix for this category was reverted; not retrying the same targeted fix",
+        "addressed_cases": [
+          "amb-03"
+        ]
+      }
+    ],
+    "decision": "no change",
+    "stop_reason": "optimizer found no applicable targeted fix"
+  }
+]

@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Monochrome: white panels on a soft grey canvas, near-black ink; dark mode is the exact inverse.
+   Values are "R G B" so Tailwind can apply opacity. Colour is reserved for status (pass, warning, failure). */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --ink-950: 244 244 245; --ink-900: 255 255 255; --ink-850: 255 255 255; --ink-800: 239 239 241; --ink-700: 228 228 231;
+  --ink-600: 212 212 216; --ink-500: 150 150 160; --ink-400: 113 113 122; --ink-300: 55 55 62; --ink-100: 11 16 32;
+  --canvas: 248 248 249;
+  --accent: 11 16 32; --accent-dim: 239 239 241;
+  --pass: 21 128 61; --pass-dim: 228 246 234;
+  --warn: 180 83 9; --warn-dim: 254 243 219;
+  --fail: 190 40 40; --fail-dim: 254 229 229;
+  --info: 82 82 91; --info-dim: 239 239 241;
+  --shadow: 0 1px 2px rgb(11 16 32 / 0.04);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink-950: 9 9 11; --ink-900: 17 17 20; --ink-850: 22 22 26; --ink-800: 34 34 39; --ink-700: 42 42 48;
+  --ink-600: 63 63 70; --ink-500: 113 113 122; --ink-400: 161 161 170; --ink-300: 212 212 216; --ink-100: 250 250 250;
+  --canvas: 14 14 17;
+  --accent: 250 250 250; --accent-dim: 34 34 39;
+  --pass: 74 222 128; --pass-dim: 20 42 28;
+  --warn: 251 191 36; --warn-dim: 48 36 12;
+  --fail: 248 113 113; --fail-dim: 52 22 22;
+  --info: 161 161 170; --info-dim: 34 34 39;
+  --shadow: none;
+}
+html, body, #root { height: 100%; }
+body { @apply bg-ink-900 text-ink-300 font-sans antialiased; font-size: 14px; letter-spacing: -0.005em; transition: background-color .25s, color .25s; }
+::selection { background: rgb(var(--accent) / 0.25); }
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--ink-600)) transparent; }
+.num { @apply font-mono tabular-nums; }
+.serif { @apply font-sans font-medium tracking-[-0.025em]; }
+.card { @apply bg-ink-850 border border-ink-700 rounded-2xl; box-shadow: var(--shadow); }
+.btn { @apply inline-flex items-center gap-2 rounded-full border border-ink-700 bg-ink-850 px-3.5 py-1.5 text-sm text-ink-100 transition-all duration-150 hover:border-ink-500 hover:bg-ink-800 active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed; }
+.btn-primary { @apply border-transparent bg-ink-100 text-ink-850 hover:opacity-90 hover:bg-ink-100 hover:border-transparent; }
+.btn-accent { @apply border-accent/50 bg-accent-dim text-accent hover:border-accent; }
+.input { @apply w-full rounded-xl border border-ink-700 bg-ink-850 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15; }
+.label { @apply text-[11px] uppercase tracking-[0.08em] text-ink-500; }
+.eyebrow { @apply text-[12px] text-ink-500; }
+.hairline { @apply border-ink-700; }
+.prose-md { @apply text-[14.5px] leading-[1.75] text-ink-300; }
+.prose-md h1 { @apply mb-6 text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink-100; }
+.prose-md h2 { @apply mb-3 mt-10 text-[19px] font-medium tracking-[-0.01em] text-ink-100; }
+.prose-md h3 { @apply mb-2 mt-6 text-[15px] font-medium text-ink-100; }
+.prose-md p { @apply my-3; }
+.prose-md ul, .prose-md ol { @apply my-3 space-y-1.5 pl-5; }
+.prose-md ul { @apply list-disc; }
+.prose-md ol { @apply list-decimal; }
+.prose-md li::marker { @apply text-ink-500; }
+.prose-md code { @apply rounded bg-ink-800 px-1 py-0.5 font-mono text-[12.5px] text-ink-100; }
+.prose-md pre { @apply my-4 overflow-x-auto rounded-xl border border-ink-700 bg-ink-950 p-4 text-[12px]; }
+.prose-md pre code { @apply bg-transparent p-0; }
+.prose-md table { @apply my-5 w-full border-collapse text-[12.5px]; display: block; overflow-x: auto; }
+.prose-md th, .prose-md td { @apply border-b border-ink-700 px-3 py-2 text-left align-top; }
+.prose-md th { @apply font-medium text-ink-500; }
+.prose-md strong { @apply font-medium text-ink-100; }
+.prose-md em { @apply text-ink-400; }
+.prose-md blockquote { @apply my-4 border-l-2 border-ink-600 pl-4 text-ink-400; }
+.react-flow__node-default { background: rgb(var(--ink-950)) !important; color: rgb(var(--ink-300)); border: 1px solid rgb(var(--ink-700)) !important; border-radius: 14px !important; box-shadow: none !important; padding: 12px 14px !important; width: 196px !important; text-align: left; }
+.react-flow__node-default.rf-pass { border-color: rgb(var(--pass) / 0.6) !important; }
+.react-flow__node-default.rf-info { border-color: rgb(var(--ink-500)) !important; }
+.react-flow__node-default.rf-warn { border-color: rgb(var(--warn) / 0.6) !important; }
+.react-flow__node-default.rf-fail { border-color: rgb(var(--fail) / 0.5) !important; }
+.react-flow__node-default.selected, .react-flow__node-default:focus { box-shadow: 0 0 0 3px rgb(var(--ink-100) / 0.08) !important; }
+.react-flow__handle { opacity: 0; }
+.react-flow__controls { box-shadow: none !important; }
+.react-flow__controls-button { background: rgb(var(--ink-850)) !important; border-color: rgb(var(--ink-700)) !important; fill: rgb(var(--ink-400)) !important; }
+.react-flow__background { background: rgb(var(--ink-850)); }
+.react-flow__edge-textbg { fill: rgb(var(--ink-850)); }

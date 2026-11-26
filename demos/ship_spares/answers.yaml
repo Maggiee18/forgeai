@@ -1,0 +1,10 @@
+answers:
+  user: "Technical superintendents, the purchasing team and Chief Engineers on board who email requests."
+  audience: "Technical superintendents, the purchasing team and Chief Engineers on board who email requests."
+  tone: "Concise and businesslike; always show the part number, the unit price and the arithmetic for totals in USD."
+  currency: "USD only."
+  discount: "Apply only the supplier's highest applicable volume tier on the order value before freight; mention urgent surcharges only if the user says the order is urgent."
+  not covered: "Say it is not in the catalogue or terms and suggest contacting the purchasing team."
+  cover: "Say it is not in the catalogue or terms and suggest contacting the purchasing team."
+  approve: "It must never approve or place orders; it only explains who must approve."
+  freight: "Yes, live freight rates would be very useful if possible."

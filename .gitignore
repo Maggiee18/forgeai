@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.cache/
+.pytest_cache/
+forgeai.yaml
+.env
+runs/ui_run/
+.env
+.workspaces/
+web/node_modules/
+web/dist/

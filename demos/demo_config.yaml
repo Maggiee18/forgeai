@@ -1,0 +1,21 @@
+# Configuration used for the committed demo runs (runs/hr_policy, runs/ship_spares).
+# The API key comes from the GROQ_API_KEY environment variable, never from this file.
+backend: groq
+# Roles are spread across three models so the demos fit Groq's free daily token quota (200k tokens/model/day):
+model: openai/gpt-oss-20b          # factory: intake, guard topics, generator, eval generation, optimizer (21B MoE, 3.6B active)
+agent_model: qwen/qwen3.8-27b      # the produced agent answers on this model
+judge_model: openai/gpt-oss-120b   # judge: a different family from the agent, against self preference bias
+guard_model: qwen/qwen3.8-27b      # decides cross-document contradictions (it was the more accurate of the two in our tests)
+embedding: wordllama
+max_iterations: 3
+min_gain: 0.02
+max_tokens: 600000
+tournament: true
+tournament_candidates: 2   # trimmed to fit the free tier daily token quota
+tournament_cases: 6
+n_answerable: 10
+n_cross_doc: 4
+n_ambiguous: 4
+n_out_of_scope: 5
+n_tool: 3
+holdout_fraction: 0.3

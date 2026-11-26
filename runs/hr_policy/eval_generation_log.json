@@ -1,0 +1,109 @@
+{
+  "accepted": 25,
+  "rejected": [
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "How many weeks of paid maternity leave are female employees entitled to for their first two children if they have at least 80 days of service in the 12 months before delivery?",
+        "fact": "up to 8 weeks may be taken before delivery"
+      },
+      "reason": "fact not required by the question: not asked in the question"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If I receive a gift worth INR 2,500 from a supplier, what must I do within 5 working days?",
+        "fact": "value is below INR 2,000 per occasion"
+      },
+      "reason": "fact not required by the question: gift exceeds INR 2,000, so fact is not applicable"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If I receive a gift worth INR 2,500 from a supplier, what must I do within 5 working days?",
+        "fact": "Cash gifts of any amount must be refused"
+      },
+      "reason": "fact not required by the question: cash gift rule not relevant to the question"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If I take up to 30 days of leave without pay after exhausting all paid leave, how does the 30‑day claim window for travel expenses affect my reimbursement process?",
+        "fact": "Leave without pay does not count towards service for the purpose of annual leave accrual."
+      },
+      "reason": "fact not required by the question: not asked about accrual"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If I take up to 30 days of leave without pay after exhausting all paid leave, how does the 30‑day claim window for travel expenses affect my reimbursement process?",
+        "fact": "Claims submitted after 30 days up to 60 days need approval from the Head of"
+      },
+      "reason": "fact not required by the question: not requested"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If an employee wants to combine an official trip with personal leave, how many days of annual leave can they use, and what is the maximum single spell allowed?",
+        "fact": "An employee may combine an official trip with personal leave if the reporting manager approves"
+      },
+      "reason": "fact not required by the question: approval detail not requested"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "If an employee wants to combine an official trip with personal leave, how many days of annual leave can they use, and what is the maximum single spell allowed?",
+        "facts_a": [
+          "21 days of annual leave per leave year",
+          "single spell of annual leave may not exceed 15 working days without approval"
+        ],
+        "facts_b": [
+          "An employee may combine an official trip with personal leave if the reporting manager approves"
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If I need to take sick leave during a business trip, how should I manage the travel advance and the sick leave documentation?",
+        "fact": "Employees receive 12 days of sick leave per leave year."
+      },
+      "reason": "fact not required by the question: not needed for this question"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If I need to take sick leave during a business trip, how should I manage the travel advance and the sick leave documentation?",
+        "fact": "A travel advance of up to 75 percent of the estimated trip cost may be"
+      },
+      "reason": "fact not required by the question: incomplete and not asked"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "How should a shore‑based employee with a work‑related grievance proceed if they need to take a 10‑day annual leave spell?",
+        "fact": "Level 1 who must respond within 5 working days."
+      },
+      "reason": "fact not required by the question: not relevant to leave procedure"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "How should a shore‑based employee with a work‑related grievance proceed if they need to take a 10‑day annual leave spell?",
+        "facts_a": [
+          "Level 1: raise the grievance with the reporting manager, who must respond within 5 working days."
+        ],
+        "facts_b": [
+          "A single spell of annual leave may not exceed 15 working days without approval from the Head of Department."
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "ambiguous",
+      "candidate": "If I get a gift worth INR 2,500 from a supplier, what must I do within 5 working days?",
+      "reason": "rewrite too close to the original"
+    }
+  ]
+}

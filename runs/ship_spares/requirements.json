@@ -1,0 +1,390 @@
+{
+  "agent_name": "spareproc-assistant",
+  "purpose": "Provide procurement assistance for ship superintendents and purchasing staff by sourcing spare parts, calculating costs, estimating delivery, and quoting freight.",
+  "scope": "Answers only from the supplied documents, including catalogue, procurement procedure, and supplier terms. No external data beyond live freight rates.",
+  "audience": "Technical superintendents, purchasing team, and Chief Engineers.",
+  "tone": "Professional and concise, suitable for technical maritime personnel.",
+  "must_answer_topics": [
+    "part lookup",
+    "price calculation",
+    "order total",
+    "lead time",
+    "delivery estimate",
+    "volume discount",
+    "supplier terms",
+    "approval limits",
+    "procurement procedure",
+    "freight quote"
+  ],
+  "must_refuse_topics": [
+    "personal advice",
+    "non-procurement queries",
+    "legal advice",
+    "financial planning beyond scope",
+    "non-maritime procurement",
+    "non-supplier related questions",
+    "unverified external data"
+  ],
+  "tool_needs": [
+    "lookup part in catalogue",
+    "calculate price with discount",
+    "add freight to total",
+    "compute delivery date from today",
+    "retrieve supplier terms",
+    "extract approval limits"
+  ],
+  "clarifications": [
+    {
+      "question": "Who are the primary users of the assistant—ship superintendents, purchasing staff, or both?",
+      "why": "Clarifies user roles to tailor interface and permissions.",
+      "answer": "Technical superintendents, the purchasing team and Chief Engineers on board who email requests.",
+      "source": "answers_file"
+    },
+    {
+      "question": "What tone and level of formality should the assistant use when communicating with users?",
+      "why": "Ensures consistent and appropriate communication style.",
+      "answer": "Technical superintendents, the purchasing team and Chief Engineers on board who email requests.",
+      "source": "answers_file"
+    },
+    {
+      "question": "Are there any parts of the procurement procedure that the assistant should explicitly flag as out of scope (e.g., handling of critical spares or urgent requisitions)?",
+      "why": "Prevents the assistant from providing unsupported guidance on special cases.",
+      "answer": "All procedures are within scope; the assistant should handle critical and urgent requisitions as per the documents.",
+      "source": "assumed"
+    },
+    {
+      "question": "How should the assistant handle situations where the catalogue lacks a requested part or the supplier information is missing?",
+      "why": "Defines fallback behavior for incomplete data.",
+      "answer": "Return a clear message indicating the part is unavailable and suggest contacting the procurement team.",
+      "source": "assumed"
+    },
+    {
+      "question": "Do we need the assistant to perform real-time freight rate lookups, or should it use a static rate table?",
+      "why": "Determines integration requirements for live data feeds.",
+      "answer": "Yes, live freight rates would be very useful if possible.",
+      "source": "answers_file"
+    }
+  ],
+  "groundability": [
+    {
+      "topic": "part lookup",
+      "status": "supported",
+      "evidence": "part_number: ME-TC-4100; description: Turbocharger nozzle ring; equipment: Main engine; maker: ABB; unit: pc; unit_price_usd: 8950.00; stock_on_hand: 0; lead_time_days: 70; min_order_qty: 1; supplier: Harbourline Spares",
+      "sources": [
+        "spares_catalogue.csv"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "price calculation",
+      "status": "supported",
+      "evidence": "computed by the 'calculator' tool from document data",
+      "sources": [
+        "spares_catalogue.csv"
+      ],
+      "method": "tool registry: computation over document data"
+    },
+    {
+      "topic": "order total",
+      "status": "supported",
+      "evidence": "A volume discount is applied per purchase order on the total order value before freight.",
+      "sources": [
+        "Supplier_Terms_Harbourline_Spares.pdf",
+        "Supplier_Terms_Poseidon_Marine.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "lead time",
+      "status": "supported",
+      "evidence": "lead_time_days: 20",
+      "sources": [
+        "spares_catalogue.csv"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "delivery estimate",
+      "status": "supported",
+      "evidence": "computed by the 'current_date' tool from document data",
+      "sources": [
+        "Supplier_Terms_Harbourline_Spares.pdf",
+        "Supplier_Terms_Poseidon_Marine.pdf"
+      ],
+      "method": "tool registry: computation over document data"
+    },
+    {
+      "topic": "volume discount",
+      "status": "supported",
+      "evidence": "A volume discount is applied per purchase order on the total order value before freight. Orders of USD 5,000 or more receive a 5 percent discount. Orders of USD 15,000 or more receive an 8 percent discount. Orders of USD 40,000 or more receive a 12 percent discount. Discounts do not combine; only the highest applicable tier applies.",
+      "sources": [
+        "Supplier_Terms_Poseidon_Marine.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "supplier terms",
+      "status": "supported",
+      "evidence": "Invoices are payable net 30 days from the date of invoice. No early payment discount is offered.",
+      "sources": [
+        "Supplier_Terms_Harbourline_Spares.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "approval limits",
+      "status": "supported",
+      "evidence": "Approval limits apply to the total value of the purchase order after discounts. Up to USD 2,000: Chief Engineer for engine spares, or Master for deck and safety spares. Above USD 2,000 and up to USD 10,000: Technical Superintendent. Above USD 10,000 and up to USD 50,000: Fleet Manager. Above USD 50,000: Technical Director. Orders may not be split into smaller orders to avoid an approval limit.",
+      "sources": [
+        "Spares_Procurement_Procedure.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "procurement procedure",
+      "status": "supported",
+      "evidence": "This procedure governs how spare parts for the managed fleet are requisitioned, approved, ordered, delivered and received.",
+      "sources": [
+        "Spares_Procurement_Procedure.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "freight quote",
+      "status": "unsupported",
+      "evidence": "",
+      "sources": [],
+      "method": "llm + quote verification"
+    }
+  ],
+  "ungroundable_topics": [
+    "freight quote"
+  ],
+  "conflicts": [],
+  "conflict_checks": [
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c4",
+      "doc_b": "Supplier_Terms_Poseidon_Marine.pdf#c5",
+      "about": "Urgent order surcharge terms",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares",
+        "Poseidon Marine"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c2",
+      "doc_b": "Supplier_Terms_Poseidon_Marine.pdf#c3",
+      "about": "Payment terms and discounts",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares",
+        "Poseidon Marine"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c8",
+      "doc_b": "Supplier_Terms_Poseidon_Marine.pdf#c9",
+      "about": "Return policy for unused parts",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares",
+        "Poseidon Marine"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c3",
+      "doc_b": "Supplier_Terms_Poseidon_Marine.pdf#c4",
+      "about": "Volume discount tiers",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares",
+        "Poseidon Marine"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c3",
+      "doc_b": "Spares_Procurement_Procedure.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares supplier",
+        "Internal procurement approval process"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Poseidon_Marine.pdf#c4",
+      "doc_b": "Spares_Procurement_Procedure.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Poseidon Marine supplier volume discounts",
+        "Internal procurement approval limits"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Harbourline_Spares.pdf#c3",
+      "doc_b": "Spares_Procurement_Procedure.pdf#c4",
+      "about": "Order thresholds and requirements",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Harbourline Spares supplier",
+        "Procurement process for spares orders"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Poseidon_Marine.pdf#c4",
+      "doc_b": "Spares_Procurement_Procedure.pdf#c4",
+      "about": "Order value thresholds and associated requirements",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Poseidon Marine (supplier) purchase orders",
+        "Spares procurement orders (general organizational procedure)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Spares_Procurement_Procedure.pdf#c5",
+      "doc_b": "Supplier_Terms_Poseidon_Marine.pdf#c10",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Internal approval authority for purchase orders",
+        "Validity period of supplier quotations"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Spares_Procurement_Procedure.pdf#c5",
+      "doc_b": "Supplier_Terms_Harbourline_Spares.pdf#c9",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Internal approval authority for purchase orders of engine, deck, and safety spares",
+        "Validity period of quotations from the supplier Harbourline Spares"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Poseidon_Marine.pdf#c6",
+      "doc_b": "Supplier_Terms_Harbourline_Spares.pdf#c5",
+      "about": "Delivery terms and free delivery thresholds",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Poseidon Marine",
+        "Harbourline Spares"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Supplier_Terms_Poseidon_Marine.pdf#c10",
+      "doc_b": "Supplier_Terms_Harbourline_Spares.pdf#c9",
+      "about": "quotation validity period",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Poseidon Marine",
+        "Harbourline Spares"
+      ],
+      "outcome": "no conflict (decider)"
+    }
+  ],
+  "knowledge_sources": [
+    {
+      "doc": "Spares_Procurement_Procedure.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 483 words",
+      "covers": [
+        "Purpose",
+        "Raising a Requisition",
+        "Quotations",
+        "Approval Limits",
+        "OEM and Non OEM Parts",
+        "Critical Spares",
+        "Urgent Requisitions",
+        "Delivery and Receipt",
+        "Records"
+      ]
+    },
+    {
+      "doc": "Supplier_Terms_Harbourline_Spares.pdf",
+      "kind": "pdf",
+      "size": "1 pages, 259 words",
+      "covers": [
+        "Volume Discounts",
+        "Urgent Orders",
+        "Delivery",
+        "Documentation",
+        "Warranty",
+        "Returns",
+        "Quotation Validity"
+      ]
+    },
+    {
+      "doc": "Supplier_Terms_Poseidon_Marine.pdf",
+      "kind": "pdf",
+      "size": "1 pages, 296 words",
+      "covers": [
+        "Payment Terms",
+        "Volume Discounts",
+        "Urgent Orders",
+        "Delivery",
+        "Documentation",
+        "Warranty",
+        "Returns",
+        "Quotation Validity"
+      ]
+    },
+    {
+      "doc": "spares_catalogue.csv",
+      "kind": "csv",
+      "size": "40 rows",
+      "covers": [
+        "part_number",
+        "description",
+        "equipment",
+        "maker",
+        "unit",
+        "unit_price_usd",
+        "stock_on_hand",
+        "lead_time_days",
+        "min_order_qty",
+        "supplier"
+      ]
+    }
+  ],
+  "known_limitations": [
+    "Cannot answer: freight quote (not in the documents).",
+    "Answers only from the supplied documents; no access to personal records or live systems."
+  ],
+  "uncertainties": [
+    "Assumed (nobody answered): Are there any parts of the procurement procedure that the assistant should explicitly flag as out of scope (e.g., handling of critical spares or urgent requisitions)? -> All procedures are within scope; the assistant should handle critical and urgent requisitions as per the documents.",
+    "Assumed (nobody answered): How should the assistant handle situations where the catalogue lacks a requested part or the supplier information is missing? -> Return a clear message indicating the part is unavailable and suggest contacting the procurement team."
+  ],
+  "flags": [
+    "'freight quote' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering."
+  ],
+  "recommendations": [
+    "Either add a source document covering 'freight quote' or remove it from the scope."
+  ],
+  "approved": true,
+  "approval_note": "human checkpoint disabled (unattended run)"
+}

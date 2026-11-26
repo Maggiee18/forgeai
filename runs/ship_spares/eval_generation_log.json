@@ -1,0 +1,114 @@
+{
+  "accepted": 27,
+  "rejected": [
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "Who must approve a purchase order for engine spares worth USD 1,800?",
+        "fact": "USD 2,000"
+      },
+      "reason": "fact not required by the question: price threshold irrelevant"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "How many quotations are required for a purchase order of USD 12,000?",
+        "fact": "Orders above USD 2,000 require at least two quotations"
+      },
+      "reason": "fact not required by the question: redundant, less specific"
+    },
+    {
+      "type": "answerable",
+      "candidate": "What surcharge is applied to urgent orders that must be dispatched within 72 hours, and when is it applied relative to the volume discount?",
+      "reason": "near duplicate of an existing case"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "What is the delivery charge for an order of USD 4,000 to a vessel at an Indian port?",
+        "fact": "the vessel at any Indian port is free for orders of USD 5,000 or more"
+      },
+      "reason": "fact not required by the question: threshold info not needed for 4,000 case"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If a purchase order totals USD 18,000 before freight, what volume discount percentage will be applied?",
+        "fact": "Discounts do not combine; only the highest applicable tier applies"
+      },
+      "reason": "fact not required by the question: not needed for single tier answer"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "What are the surcharge rates and dispatch windows for urgent orders from Harbourline Spares and Poseidon Marine?",
+        "facts_a": [
+          "Urgent orders requested for dispatch within 48 hours carry a surcharge of 20 percent of the order value."
+        ],
+        "facts_b": null
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What are the delivery cost thresholds and charges for orders from Harbourline Spares and Poseidon Marine?",
+        "fact": "Prices are quoted DAP Mumbai."
+      },
+      "reason": "fact not required by the question: not about delivery cost thresholds"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What are the delivery cost thresholds and charges for orders from Harbourline Spares and Poseidon Marine?",
+        "fact": "Prices are quoted FCA Singapore."
+      },
+      "reason": "fact not required by the question: not about delivery cost thresholds"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If we place an urgent order for spare parts, can we return unused parts within 30 days and what surcharge applies?",
+        "fact": "in original packing may be returned within 30 days of delivery A restocking fee of"
+      },
+      "reason": "fact not required by the question: Only return policy, not surcharge"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "If we place an urgent order for spare parts, can we return unused parts within 30 days and what surcharge applies?",
+        "facts_a": [
+          "Urgent orders requested for dispatch within 48 hours carry a surcharge of 20 percent of the order value. The urgent surcharge is applied after the volume discount."
+        ],
+        "facts_b": [
+          "Unused parts in original packing may be returned within 30 days of delivery. A restocking fee of 10 percent of the part value applies."
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "How should the Chief Engineer handle a damaged spare item received at the vessel to ensure timely reporting and potential early payment discount on the invoice?",
+        "fact": "Spares are delivered to the vessel through the forwarding agent at the next suitable port."
+      },
+      "reason": "fact not required by the question: delivery method not needed for handling damaged spare"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "How should the Chief Engineer handle a damaged spare item received at the vessel to ensure timely reporting and potential early payment discount on the invoice?",
+        "fact": "Invoices are payable net 45 days from the date of delivery to the vessel or"
+      },
+      "reason": "fact not required by the question: payment terms not needed for early discount"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "When ordering a spare part costing $12,000 from a non‑OEM supplier, how many quotations are required and what is the restocking fee if the part is returned unused?",
+        "fact": "Unused parts in original packing may be returned within 30 days of delivery"
+      },
+      "reason": "fact not required by the question: return window not asked"
+    }
+  ]
+}

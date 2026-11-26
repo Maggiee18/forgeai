@@ -1,0 +1,12 @@
+# Pre-recorded answers from the requester, used for the committed unattended demo run.
+# Matched by keyword against the interviewer's questions; anything unmatched is answered with the
+# interviewer's own default and recorded as an ASSUMPTION in requirements.md.
+answers:
+  audience: "All shore based employees in Visakhapatnam and Mumbai, grades G1 to G5. Not seafarers; their leave is under the CBA."
+  user: "All shore based employees in Visakhapatnam and Mumbai, grades G1 to G5. Not seafarers; their leave is under the CBA."
+  tone: "Friendly, plain English, short answers that quote the exact number or limit from the policy."
+  cover: "Say clearly that the policy documents do not cover it and suggest contacting HR at hr@meridianship.example."
+  not covered: "Say clearly that the policy documents do not cover it and suggest contacting HR at hr@meridianship.example."
+  personal: "No personal balances or individual cases; it cannot see HRMS data. It explains the rules only."
+  legal: "No legal advice and no opinions on disputes; for harassment it should point to the Internal Committee."
+  salary: "Yes, staff want salary bands and payroll dates included if possible."

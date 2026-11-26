@@ -1,0 +1,38 @@
+{
+  "tools_kept": [
+    {
+      "name": "csv_lookup",
+      "reason": "lookup part in catalogue",
+      "evidence": [
+        "catalogue",
+        "catalog",
+        "lookup",
+        "documents include CSV data"
+      ]
+    },
+    {
+      "name": "calculator",
+      "reason": "calculate price with discount and add freight to total",
+      "evidence": [
+        "total",
+        "cost",
+        "calculate",
+        "compute",
+        "discount",
+        "price",
+        "estimate"
+      ]
+    },
+    {
+      "name": "current_date",
+      "reason": "compute delivery date from today",
+      "evidence": [
+        "today",
+        "date",
+        "lead time",
+        "delivery date"
+      ]
+    }
+  ],
+  "tools_rejected": []
+}
