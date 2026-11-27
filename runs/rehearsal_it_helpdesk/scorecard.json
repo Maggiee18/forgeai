@@ -1,0 +1,118 @@
+[
+  {
+    "iteration": 0,
+    "agent_version": 0,
+    "scorecard": {
+      "n_cases": 29,
+      "pass_rate": 0.897,
+      "dev_pass_rate": 0.857,
+      "holdout_pass_rate": 1.0,
+      "by_type": {
+        "ambiguous": {
+          "n": 4,
+          "pass_rate": 0.5
+        },
+        "answerable": {
+          "n": 10,
+          "pass_rate": 0.9
+        },
+        "conflict": {
+          "n": 1,
+          "pass_rate": 1.0
+        },
+        "cross_doc": {
+          "n": 4,
+          "pass_rate": 1.0
+        },
+        "out_of_scope": {
+          "n": 5,
+          "pass_rate": 1.0
+        },
+        "tool": {
+          "n": 3,
+          "pass_rate": 1.0
+        },
+        "ungroundable": {
+          "n": 2,
+          "pass_rate": 1.0
+        }
+      },
+      "answer_fact_recall": 0.879,
+      "completeness": 0.921,
+      "citation_precision": 0.955,
+      "answer_relevance": 0.621,
+      "refusal_accuracy": 1.0,
+      "wrong_refusals_on_answerable": 1,
+      "grounded_rate": 1.0,
+      "contract_ok_rate": 1.0,
+      "retrieval_hit_rate": 1.0,
+      "failures_by_category": {
+        "retrieval_miss": 0,
+        "hallucination": 0,
+        "wrong_refusal": 1,
+        "prompt_defect": 2
+      },
+      "suspected_eval_defects": 0,
+      "avg_latency_s": 0.0
+    },
+    "decision": "baseline"
+  },
+  {
+    "iteration": 1,
+    "agent_version": 1,
+    "scorecard": {
+      "n_cases": 29,
+      "pass_rate": 0.862,
+      "dev_pass_rate": 0.81,
+      "holdout_pass_rate": 1.0,
+      "by_type": {
+        "ambiguous": {
+          "n": 4,
+          "pass_rate": 0.5
+        },
+        "answerable": {
+          "n": 10,
+          "pass_rate": 0.9
+        },
+        "conflict": {
+          "n": 1,
+          "pass_rate": 1.0
+        },
+        "cross_doc": {
+          "n": 4,
+          "pass_rate": 0.75
+        },
+        "out_of_scope": {
+          "n": 5,
+          "pass_rate": 1.0
+        },
+        "tool": {
+          "n": 3,
+          "pass_rate": 1.0
+        },
+        "ungroundable": {
+          "n": 2,
+          "pass_rate": 1.0
+        }
+      },
+      "answer_fact_recall": 0.849,
+      "completeness": 0.889,
+      "citation_precision": 0.977,
+      "answer_relevance": 0.617,
+      "refusal_accuracy": 1.0,
+      "wrong_refusals_on_answerable": 1,
+      "grounded_rate": 1.0,
+      "contract_ok_rate": 1.0,
+      "retrieval_hit_rate": 1.0,
+      "failures_by_category": {
+        "retrieval_miss": 0,
+        "hallucination": 0,
+        "wrong_refusal": 1,
+        "prompt_defect": 3
+      },
+      "suspected_eval_defects": 0,
+      "avg_latency_s": 0.0
+    },
+    "decision": "reverted (dev score did not improve)"
+  }
+]

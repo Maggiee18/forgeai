@@ -49,7 +49,7 @@
         "prompt_defect": 1
       },
       "suspected_eval_defects": 1,
-      "avg_latency_s": 0.22
+      "avg_latency_s": 0.0
     },
     "decision": "baseline"
   },
@@ -103,7 +103,7 @@
         "prompt_defect": 1
       },
       "suspected_eval_defects": 1,
-      "avg_latency_s": 7.61
+      "avg_latency_s": 0.0
     },
     "decision": "reverted (dev score did not improve)"
   }

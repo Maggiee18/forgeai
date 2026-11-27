@@ -9,8 +9,10 @@ def pct(x):
 
 
 rows = []
-for name in ("hr_policy", "ship_spares"):
+for name in ("hr_policy", "ship_spares", "rehearsal_it_helpdesk"):
     d = Path("runs") / name
+    if not (d / "scorecard.json").exists():
+        continue
     its = json.loads((d / "scorecard.json").read_text())
     defn = json.loads((d / "agent_definition.json").read_text())
     shipped = [i for i in its if i["agent_version"] == defn["version"] and not str(i.get("decision", "")).startswith("reverted")][-1]["scorecard"]

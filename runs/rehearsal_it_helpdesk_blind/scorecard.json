@@ -1,0 +1,102 @@
+[
+  {
+    "iteration": 0,
+    "agent_version": 0,
+    "scorecard": {
+      "n_cases": 25,
+      "pass_rate": 0.8,
+      "dev_pass_rate": 0.722,
+      "holdout_pass_rate": 1.0,
+      "by_type": {
+        "ambiguous": {
+          "n": 3,
+          "pass_rate": 0.667
+        },
+        "answerable": {
+          "n": 10,
+          "pass_rate": 0.9
+        },
+        "cross_doc": {
+          "n": 4,
+          "pass_rate": 0.5
+        },
+        "out_of_scope": {
+          "n": 5,
+          "pass_rate": 0.8
+        },
+        "tool": {
+          "n": 3,
+          "pass_rate": 1.0
+        }
+      },
+      "answer_fact_recall": 0.858,
+      "completeness": 0.858,
+      "citation_precision": 0.975,
+      "answer_relevance": 0.622,
+      "refusal_accuracy": 0.8,
+      "wrong_refusals_on_answerable": 0,
+      "grounded_rate": 1.0,
+      "contract_ok_rate": 1.0,
+      "retrieval_hit_rate": 1.0,
+      "failures_by_category": {
+        "retrieval_miss": 0,
+        "hallucination": 0,
+        "wrong_refusal": 1,
+        "prompt_defect": 4
+      },
+      "suspected_eval_defects": 0,
+      "avg_latency_s": 9.05
+    },
+    "decision": "baseline"
+  },
+  {
+    "iteration": 1,
+    "agent_version": 1,
+    "scorecard": {
+      "n_cases": 25,
+      "pass_rate": 0.8,
+      "dev_pass_rate": 0.722,
+      "holdout_pass_rate": 1.0,
+      "by_type": {
+        "ambiguous": {
+          "n": 3,
+          "pass_rate": 0.667
+        },
+        "answerable": {
+          "n": 10,
+          "pass_rate": 0.9
+        },
+        "cross_doc": {
+          "n": 4,
+          "pass_rate": 0.5
+        },
+        "out_of_scope": {
+          "n": 5,
+          "pass_rate": 0.8
+        },
+        "tool": {
+          "n": 3,
+          "pass_rate": 1.0
+        }
+      },
+      "answer_fact_recall": 0.858,
+      "completeness": 0.858,
+      "citation_precision": 1.0,
+      "answer_relevance": 0.621,
+      "refusal_accuracy": 0.8,
+      "wrong_refusals_on_answerable": 0,
+      "grounded_rate": 1.0,
+      "contract_ok_rate": 1.0,
+      "retrieval_hit_rate": 1.0,
+      "failures_by_category": {
+        "retrieval_miss": 0,
+        "hallucination": 0,
+        "wrong_refusal": 1,
+        "prompt_defect": 4
+      },
+      "suspected_eval_defects": 0,
+      "avg_latency_s": 7.64
+    },
+    "decision": "reverted (dev score did not improve)"
+  }
+]

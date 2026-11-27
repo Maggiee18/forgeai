@@ -72,3 +72,33 @@ groundability guard must flag that gap instead of letting the agent invent numbe
    > Technical Superintendent, Fleet Manager, Technical Director), number of quotations required, OEM vs
    > non OEM rules, critical spares that must never be below minimum on board, urgent requisitions,
    > delivery to vessel and receipt confirmation, and documentation retention.
+
+## Rehearsal: IT helpdesk assistant (a brief the factory was never tuned on)
+
+The review runs ForgeAI on a brief and documents it has never seen, so the factory was also run, unchanged and
+fully unattended (no answers file: every intake question takes the interviewer's own default), on a third domain
+for a different fictional company, **Corvane Analytics Pvt Ltd** (Bengaluru / Pune). No code or prompt was
+changed for this run. The documents were synthesised by an LLM (Claude) with the prompts below; numbers were
+checked by hand (every catalogue item's approval level matches the value thresholds in IT-PRC-03).
+
+Shared system prompt: as above, but for an Indian data analytics company's IT department; INR for prices.
+
+1. **Information Security and Acceptable Use Policy (IT-POL-01)**
+   > About 550 words. Cover: password length, reuse and rotation, MFA, screen lock, lost or stolen devices with a
+   > reporting deadline, USB storage and personal devices, VPN and public Wi-Fi, data classification levels,
+   > phishing reporting, software installation, security incident reporting deadline, monitoring and violations.
+2. **IT Service Desk Guide (IT-GDE-02)**
+   > About 450 words. Cover: contact channels and hours, priorities P1 to P4 with definitions, response and
+   > resolution targets, escalation, password resets and account lockout, ticket closure and reopening, major
+   > incidents, feedback.
+3. **Hardware and Software Request Procedure (IT-PRC-03)**
+   > About 450 words. Cover: laptop entitlement and refresh cycle, how to request, approval thresholds in INR,
+   > software requests and security review, new joiner kits, accessories and monitors, returns on exit.
+   > Point to the device catalogue for prices and lead times.
+4. **Device catalogue (CSV)**
+   > 15 items: laptops, monitors, accessories, a phone, encrypted storage and a software licence. Columns:
+   > item_code, item, category, eligible_roles, price_inr, lead_time_days, approval_level, in_stock.
+
+**Planted for the guard:** the brief asks for live ticket status and current outages, which no document can
+answer (live data). And the request procedure's new joiner note says passwords change every **60** days while
+the security policy says every **90** days.

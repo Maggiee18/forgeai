@@ -1,0 +1,120 @@
+{
+  "ran": true,
+  "trials": 16,
+  "accuracy": 1.0,
+  "details": [
+    {
+      "case": "ans-04",
+      "variant": "gold_paraphrase",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "ans-04",
+      "variant": "numbers_corrupted",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "ans-04",
+      "variant": "long_but_empty",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "ans-04",
+      "variant": "long_and_correct",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "ans-03",
+      "variant": "gold_paraphrase",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "ans-03",
+      "variant": "numbers_corrupted",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "ans-03",
+      "variant": "long_but_empty",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "ans-03",
+      "variant": "long_and_correct",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "cro-04",
+      "variant": "gold_paraphrase",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "cro-04",
+      "variant": "numbers_corrupted",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "cro-04",
+      "variant": "long_but_empty",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "cro-04",
+      "variant": "long_and_correct",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "amb-01",
+      "variant": "gold_paraphrase",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    },
+    {
+      "case": "amb-01",
+      "variant": "numbers_corrupted",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "amb-01",
+      "variant": "long_but_empty",
+      "expected_pass": false,
+      "judge_pass": false,
+      "agree": true
+    },
+    {
+      "case": "amb-01",
+      "variant": "long_and_correct",
+      "expected_pass": true,
+      "judge_pass": true,
+      "agree": true
+    }
+  ],
+  "decision": "llm judge enabled"
+}

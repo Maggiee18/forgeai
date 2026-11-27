@@ -17,6 +17,7 @@ const NAV = [
   { to: "/reports", label: "Reports", icon: FileText },
 ];
 const DEMOS = ["hr_policy", "ship_spares"];
+const REHEARSALS = ["rehearsal_it_helpdesk", "rehearsal_it_helpdesk_blind"];
 
 function Logo() {
   return (
@@ -60,7 +61,8 @@ function RunsPanel({ onNavigate }: { onNavigate?: () => void }) {
   const loc = useLocation();
   const target = ["/", "/create"].includes(loc.pathname) ? "/evaluation" : loc.pathname;
   const demos = (runs ?? []).filter((r) => DEMOS.includes(r.name));
-  const others = (runs ?? []).filter((r) => !DEMOS.includes(r.name));
+  const rehearsals = (runs ?? []).filter((r) => REHEARSALS.includes(r.name));
+  const others = (runs ?? []).filter((r) => !DEMOS.includes(r.name) && !REHEARSALS.includes(r.name));
   const Item = ({ r }: { r: { name: string; final_pass_rate: number | null } }) => (
     <Link to={`${target}?run=${r.name}`} onClick={onNavigate}
       className={clsx("group flex items-center justify-between rounded-xl px-3 py-2 text-[13px] transition-colors", current === r.name ? "bg-ink-800 text-ink-100" : "text-ink-300 hover:bg-ink-800/70")}>
@@ -78,6 +80,10 @@ function RunsPanel({ onNavigate }: { onNavigate?: () => void }) {
       {demos.length > 0 && (<>
         <div className="mb-1.5 px-1 text-[12px] text-ink-500">Demonstrations</div>
         <div className="mb-5 space-y-0.5">{demos.map((r) => <Item key={r.name} r={r} />)}</div>
+      </>)}
+      {rehearsals.length > 0 && (<>
+        <div className="mb-1.5 px-1 text-[12px] text-ink-500">Unseen brief rehearsal</div>
+        <div className="mb-5 space-y-0.5">{rehearsals.map((r) => <Item key={r.name} r={r} />)}</div>
       </>)}
       <div className="mb-1.5 border-t border-ink-700 px-1 pt-4 text-[12px] text-ink-500">Your runs</div>
       <div className="flex-1 space-y-0.5 overflow-y-auto">

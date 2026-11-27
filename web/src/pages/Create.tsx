@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { ArrowRight, FileSpreadsheet, FileText, MessagesSquare, Sparkles, Upload, X } from "lucide-react";
+import { ArrowRight, FileSpreadsheet, FileText, Info, MessagesSquare, Sparkles, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { api, type Question, type Workspace } from "../api";
 import { JobLog, useJob } from "../components/JobLog";
 import { Badge, Card, ErrorBox, PageHeader, Spinner } from "../components/ui";
@@ -33,6 +33,8 @@ export default function Create() {
   const [ws, setWs] = useState<Workspace | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const loc = useLocation();
+  const [notice, setNotice] = useState<string | null>((loc.state as { notice?: string } | null)?.notice ?? null);
   const [qs, setQs] = useState<Question[] | null>(null);
   const [answers, setAnswers] = useState<string[]>([]);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -41,13 +43,21 @@ export default function Create() {
   });
 
   useEffect(() => {
-    if (wid) api.workspace(wid).then((w) => { setWs(w); if (w.questions) { setQs(w.questions); setAnswers(w.questions.map((q) => q.default_answer)); } }).catch((e) => setErr(e.message));
+    if (wid) api.workspace(wid).then((w) => { setWs(w); if (w.questions) { setQs(w.questions); setAnswers(w.questions.map((q) => q.default_answer)); } }).catch((e) => {
+      if (String(e.message).includes("workspace not found")) {
+        // free hosting wipes its disk when it sleeps: start a fresh workspace instead of showing an error
+        setWs(null); setQs(null); setJobId(null);
+        const msg = "This session was cleared. The free server restarts after about 15 minutes without visitors and forgets unfinished work. Start again below; the demonstration runs are always kept.";
+        setNotice(msg);
+        nav("/create", { replace: true, state: { notice: msg } });
+      } else setErr(e.message);
+    });
   }, [wid]);
 
   const step = !ws ? 0 : !qs ? 1 : !jobId ? 2 : 3;
 
   async function inspect() {
-    setErr(null);
+    setErr(null); setNotice(null);
     if (brief.trim().length < 20) return setErr("Write at least one full sentence describing the assistant you need.");
     if (!files.length) return setErr("Add at least one document for the agent to answer from.");
     setBusy("Reading documents…");
@@ -59,7 +69,7 @@ export default function Create() {
   }
 
   async function demo(name: string) {
-    setErr(null);
+    setErr(null); setNotice(null);
     setBusy("Loading demo…");
     try {
       const w = await api.demoWorkspace(name);
@@ -92,6 +102,13 @@ export default function Create() {
     <div>
       {ws && <PageHeader title="Create agent" subtitle="A one paragraph brief plus the documents the agent must answer from." />}
       <div className={clsx(!ws && "flex justify-center")}><Steps at={step} /></div>
+      {notice && !ws && (
+        <div className="card mb-4 flex items-start gap-3 px-4 py-3 text-[13px]">
+          <Info size={16} className="mt-0.5 shrink-0 text-ink-500" />
+          <div className="flex-1 text-ink-500">{notice}</div>
+          <button className="text-ink-500 hover:text-ink-100" onClick={() => setNotice(null)} aria-label="Dismiss"><X size={14} /></button>
+        </div>
+      )}
       {err && <div className="mb-4"><ErrorBox error={err} /></div>}
 
       {!ws && (

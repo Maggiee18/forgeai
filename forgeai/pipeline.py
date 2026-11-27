@@ -91,7 +91,7 @@ class Factory:
             tmp_answers.write_text(yaml.safe_dump({"answers": answers}), encoding="utf-8")
         clar = intake.interview(brief, docs, factory_llm, False, str(tmp_answers) if tmp_answers else cfg.answers_file, log, index=idx)
         req = intake.write_requirements(brief, docs, clar, factory_llm)
-        return run_guard(req, docs, factory_llm, log, index=idx, verifier=self._guard_client(Path(docs_folder).parent, budget, _judge))
+        return run_guard(req, docs, factory_llm, log, index=idx, verifier=self._guard_client(Path(docs_folder).parent, budget, _judge), brief=brief)
 
     def build(self, brief_path: str, docs_folder: str, out_dir: str, requirements: Requirements | None = None) -> dict:
         cfg, log = self.cfg, self.log
@@ -125,7 +125,7 @@ class Factory:
             # 2. groundability guard ---------------------------------------------
             budget.stage = "guard"
             log("\n[2/7] Groundability guard")
-            req = run_guard(req, docs, factory_llm, log, index=stage_index, verifier=self._guard_client(run, budget, judge_llm))
+            req = run_guard(req, docs, factory_llm, log, index=stage_index, verifier=self._guard_client(run, budget, judge_llm), brief=brief)
             if cfg.human_checkpoint:
                 req = intake.human_checkpoint(req, run / "requirements.json", log)
             else:
@@ -300,8 +300,9 @@ class Factory:
 
     # --------------------------------------------------------------- regression
     def regress(self, old_run: str, new_docs: str, out_dir: str) -> dict:
-        """Documents changed. Change ONE thing: replay the SHIPPED agent definition (same prompt, tools and retrieval
-        settings) against the new documents on the OLD eval set. Then (1) diff old vs new documents sentence by
+        """Documents changed. Re-run the OLD eval set on the new documents against (a) the agent the factory
+        regenerates from the same requirements, as the brief asks, and (b) the shipped definition replayed unchanged,
+        which isolates the effect of the document change. Then (1) diff old vs new documents sentence by
         sentence, (2) mark which changed sentences an existing test covers, and (3) separate genuine agent
         regressions from tests the new documents made stale."""
         import re as _re
@@ -355,43 +356,92 @@ class Factory:
         log(f"    {len(changes)} sentence level change(s); {sum(1 for c in changes if not c['covered_by'])} not covered by any existing test")
 
         # 3. replay the shipped definition on the new documents
-        req = run_guard(req, docs, factory_llm, log, verifier=self._guard_client(run, budget, judge_llm))
+        old_brief = (old / "brief.txt").read_text(encoding="utf-8") if (old / "brief.txt").exists() else ""
+        req = run_guard(req, docs, factory_llm, log, verifier=self._guard_client(run, budget, judge_llm), brief=old_brief)
         replay = shipped.model_copy(deep=True)
         replay.docs_folder = os.path.relpath(Path(new_docs).resolve(), run.resolve())
-        dump(run / "agent_definition.json", replay)
+        dump(run / "agent_definition.replayed.json", replay)
         judge = Judge(judge_llm, use_llm=True, seed=cfg.seed)
+        log("\n    [a] shipped definition replayed on the new documents")
         res = run_evals(Agent(replay, agent_llm, docs=docs), cases, judge, log=log)
+
+        # 4. what the brief asks for: the factory REGENERATES the agent from the same requirements on the new
+        #    documents (same prompt style that won the original tournament), and the OLD eval set is re-run on it
+        log("\n    [b] factory regenerates the agent on the new documents")
+        variant = (shipped.provenance or {}).get("variant", "strict")
+        tools, _ = generator.choose_tools(req, docs, factory_llm, cfg.tools_enabled)
+        regen, _ = generator.generate(req, docs, replay.docs_folder, factory_llm, cfg.tools_enabled, variant=variant, tools=tools, embedding=cfg.embedding)
+        dump(run / "agent_definition.regenerated.json", regen)
+        res_regen = run_evals(Agent(regen, agent_llm, docs=docs), cases, judge, log=log)
+
         corpus = " ".join(d.text for d in docs)
-        rows = []
-        for r in res:
-            was = old_res.get(r.case_id)
-            if was and was.passed and not r.passed:
-                case = next(c for c in cases if c.id == r.case_id)
-                gone = [f for f in case.key_facts if not fact_in_text(f, corpus)]
-                kind = "stale test: expected facts no longer in documents (policy changed)" if gone else "agent regression (facts still in documents)"
-                rows.append({"case": r.case_id, "question": r.question, "verdict": kind, "missing_facts": gone, "new_answer": r.answer[:300]})
-        fixed = [r.case_id for r in res if r.passed and old_res.get(r.case_id) and not old_res[r.case_id].passed]
-        sc, old_sc = scorecard(res), scorecard(list(old_res.values()))
+        def compare(results):
+            rows = []
+            for r in results:
+                was = old_res.get(r.case_id)
+                if was and was.passed and not r.passed:
+                    case = next(c for c in cases if c.id == r.case_id)
+                    gone = [f for f in case.key_facts if not fact_in_text(f, corpus)]
+                    kind = "stale test: expected facts no longer in documents (policy changed)" if gone else "agent regression (facts still in documents)"
+                    rows.append({"case": r.case_id, "question": r.question, "verdict": kind, "category": r.failure_category,
+                                 "missing_facts": gone, "new_answer": r.answer[:300]})
+            fixed = [r.case_id for r in results if r.passed and old_res.get(r.case_id) and not old_res[r.case_id].passed]
+            return rows, fixed
+        rows, fixed = compare(res)
+        rows_g, fixed_g = compare(res_regen)
+        # a regenerated agent starts again at v0: cases the critic loop fixed in the old run are at risk
+        loop_fixed = {}
+        if (old / "iteration_log.json").exists():
+            for it in json.loads((old / "iteration_log.json").read_text(encoding="utf-8")):
+                if it.get("decision") == "kept":
+                    for cid in it.get("newly_fixed", []):
+                        loop_fixed.setdefault(cid, it["iteration"])
+        for x in rows_g:
+            if x["case"] in loop_fixed and x["verdict"].startswith("agent regression"):
+                x["verdict"] = f"agent regression: lost the fix the critic loop made in iteration {loop_fixed[x['case']]}"
+        lost = [x["case"] for x in rows_g if "lost the fix" in x["verdict"]]
+        sc, sc_g, old_sc = scorecard(res), scorecard(res_regen), scorecard(list(old_res.values()))
         dump_jsonl(run / "regression_results.jsonl", res)
-        out = {"agent_version": shipped.version, "old_pass_rate": old_sc["pass_rate"], "new_pass_rate": sc["pass_rate"], "document_changes": changes,
-               "broke": rows, "newly_passing": fixed, "guard_flags": req.flags}
+        dump_jsonl(run / "regression_results.regenerated.jsonl", res_regen)
+        tools_old = sorted(t["name"] for t in shipped.tools)
+        tools_new = sorted(t["name"] for t in regen.tools)
+        out = {"agent_version": shipped.version, "old_pass_rate": old_sc["pass_rate"],
+               "replayed": {"pass_rate": sc["pass_rate"], "broke": rows, "newly_passing": fixed},
+               "regenerated": {"pass_rate": sc_g["pass_rate"], "broke": rows_g, "lost_critic_fixes": lost, "newly_passing": fixed_g, "variant": variant,
+                               "tools_before": tools_old, "tools_after": tools_new},
+               "document_changes": changes, "guard_flags": req.flags}
         dump(run / "regression.json", out)
         uncovered = [c for c in changes if not c["covered_by"]]
+
+        def broke_table(rs):
+            T = ["| Case | Question | Failure | Verdict | Facts gone from the documents |", "|---|---|---|---|---|"]
+            T += [f"| {x['case']} | {x['question'][:80]} | {x['category'] or '-'} | {x['verdict']} | {', '.join(x['missing_facts']) or '-'} |" for x in rs] or ["| - | none | - | - | - |"]
+            return T
         L = [f"# Regression report: {shipped.name} v{shipped.version}", "",
-             f"The shipped agent definition was replayed unchanged (same prompt, tools and retrieval settings) on the new documents, against the original {len(cases)} test cases.", "",
-             f"**Pass rate: {old_sc['pass_rate']:.0%} on the old documents → {sc['pass_rate']:.0%} on the new documents.**", "",
+             f"The documents changed. The original {len(cases)} test cases were re-run against two agents on the new documents:", "",
+             f"- **Regenerated agent**: the factory rebuilt the agent from the same requirements on the new documents (prompt style `{variant}`, the original tournament winner). This is what a rebuild would ship.",
+             "- **Replayed agent**: the shipped definition unchanged (same prompt, tools and retrieval settings). This isolates the effect of the document change alone.", "",
+             "| Agent | Pass rate on the old eval set |", "|---|---|",
+             f"| Shipped agent, old documents | {old_sc['pass_rate']:.0%} |",
+             f"| Regenerated agent, new documents | {sc_g['pass_rate']:.0%} |",
+             f"| Replayed agent, new documents | {sc['pass_rate']:.0%} |", "",
+             f"Tools: {', '.join(tools_old) or 'none'} before, {', '.join(tools_new) or 'none'} after regeneration.", "",
              f"## What changed in the documents ({len(changes)} sentence level changes)", "", "| Document | Change | Before | After | Covered by existing tests |", "|---|---|---|---|---|"]
         for c in changes:
             L.append(f"| {c['doc']} | {c['kind']} | {c['old'][:110]} | {c['new'][:110]} | {', '.join(c['covered_by']) or '**none**'} |")
-        L += ["", "## Tests that broke", "", "| Case | Question | Verdict | Facts gone from the documents |", "|---|---|---|---|"]
-        L += [f"| {x['case']} | {x['question'][:80]} | {x['verdict']} | {', '.join(x['missing_facts']) or '-'} |" for x in rows] or ["| - | none | - | - |"]
-        L += ["", f"Newly passing: {', '.join(fixed) or 'none'}", ""]
+        L += ["", "## What broke: regenerated agent", ""] + broke_table(rows_g) + ["", f"Newly passing: {', '.join(fixed_g) or 'none'}", ""]
+        if lost:
+            L += [f"**Why the regenerated agent scores lower:** {', '.join(lost)} only passed in the old run because the critic loop patched the prompt "
+                  "for them. Regeneration starts again from v0, so those learned fixes are lost. A real rebuild should run the full "
+                  "`forgeai build` (critic loop included) on the new documents, or carry the kept patches across.", ""]
+        L += ["## What broke: replayed agent", ""] + broke_table(rows) + ["", f"Newly passing: {', '.join(fixed) or 'none'}", ""]
         if uncovered:
             L += [f"## ⚠ {len(uncovered)} change(s) no existing test covers", "",
-                  "A passing replay says nothing about these. Rebuild the eval set (`forgeai build` on the new documents) so the changed rules are tested:", ""]
+                  "A passing re-run says nothing about these. Rebuild the eval set (`forgeai build` on the new documents) so the changed rules are tested:", ""]
             L += [f"- {c['doc']}: \"{(c['new'] or c['old'])[:140]}\"" for c in uncovered] + [""]
         L += ["## Guard flags on the new documents"] + [f"- {f}" for f in req.flags]
         L += ["", "Stale tests should be regenerated; agent regressions are real defects."]
         (run / "REGRESSION.md").write_text("\n".join(L), encoding="utf-8")
-        log(f"    {len(rows)} previously passing case(s) broke; {len(uncovered)} document change(s) untested; report at {run/'REGRESSION.md'}")
+        log(f"    regenerated: {sc_g['pass_rate']:.0%} ({len(rows_g)} broke); replayed: {sc['pass_rate']:.0%} ({len(rows)} broke); "
+            f"{len(uncovered)} document change(s) untested; report at {run/'REGRESSION.md'}")
         return out

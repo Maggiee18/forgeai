@@ -145,7 +145,7 @@ function WorkspaceRequirements({ wid }: { wid: string }) {
   const [runName, setRunName] = useState("");
   const { lines, job } = useJob(jobId, (j) => { if (j.state === "done") setTimeout(() => nav(`/evaluation?run=${runName}`), 1200); });
   useEffect(() => {
-    api.workspace(wid).then((w) => { setReq(w.requirements); setName((w.requirements?.agent_name || "agent").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 40)); }).catch((e) => setErr(e.message));
+    api.workspace(wid).then((w) => { setReq(w.requirements); setName((w.requirements?.agent_name || "agent").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 40)); }).catch((e) => setErr(String(e.message).includes("workspace not found") ? "This session was cleared. The free server restarts after about 15 minutes without visitors and forgets unfinished work. Start again from Create agent; the demonstration runs are always kept." : e.message));
   }, [wid]);
   if (err) return <ErrorBox error={err} />;
   if (!req) return <LoadingGrid />;

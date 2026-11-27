@@ -17,11 +17,32 @@ Design against the known failure modes of LLM-as-judge:
 from __future__ import annotations
 
 import random
+import re
 
 from . import prompts
 from .llm import LLMClient
 from .schemas import AgentResponse, CaseResult, EvalCase
-from .textutil import fact_in_text, looks_like_refusal, numbers, quote_in_text, value_numbers
+from .textutil import content_overlap, fact_in_text, looks_like_refusal, numbers, quote_in_text, tokens, value_numbers
+
+
+_LIST_MARKER = re.compile(r"(?m)^\s*\(?\d{1,2}[.)]\s+")
+_DOC_CODE = re.compile(r"\b[A-Z]{2,}-[A-Z]{2,}-\d+\b")
+_SMALL = {"and", "of", "the", "for", "to", "a", "an", "on", "in", "&"}
+
+
+def _off_topic(fact: str, question: str) -> bool:
+    """A key fact sharing no content word with the question was not asked for."""
+    return len(tokens(fact)) >= 3 and content_overlap(fact, question) == 0 and content_overlap(question, fact) == 0
+
+
+def _doc_reference(fact: str) -> bool:
+    """'Software Request Procedure (IT-PRC-03)' is a document's name, not a fact an answer must state."""
+    words = re.sub(r"[()]", " ", _DOC_CODE.sub(" ", fact)).split()
+    if _DOC_CODE.search(fact) and len(words) <= 6:
+        return True
+    # a title-cased name of a document (not a role like 'Compliance Officer', which can be a real answer)
+    return (0 < len(words) <= 6 and all(w[:1].isupper() or w.lower() in _SMALL for w in words)
+            and bool(re.search(r"\b(policy|procedure|guide|manual|handbook|document|standard|agreement|terms)\b", fact, re.I)))
 
 
 class Judge:
@@ -72,7 +93,8 @@ class Judge:
         # evidence = passage bodies + their section headings + tool results + the question itself
         evidence = " ".join(f'{r.get("section", "")} {r["text"]}' for r in resp.retrieved) + " " + " ".join(str(t.get("result", "")) for t in resp.tool_calls) + " " + case.question
         # label numbers ("Section 5", "Level 2", "Tier 1") are references, not claims
-        ans_nums = value_numbers(resp.answer)
+        # list markers ("1. ", "4) ") number the answer's own steps; they are not claims about the documents
+        ans_nums = value_numbers(_LIST_MARKER.sub(" ", resp.answer))
         unsupported = sorted(n for n in ans_nums - numbers(evidence) if not _trivial(n))
         retrieval_hit = (not case.expected_sources) or bool(set(case.expected_sources) & set(retrieved_sources))
         if case.type == "tool":
@@ -82,11 +104,17 @@ class Judge:
             refusal_ok = refused
             grounded = not unsupported or refused
             passed = refusal_ok and not (unsupported and not refused)
+            # the documents may answer this "out of scope" question after all: a retrieved section heading names the
+            # question's topic and the agent cited that document with a grounded answer
+            heading_hit = any(r.get("section") and content_overlap(r["section"], case.question) >= 0.5 and r["doc"] in resp.citations
+                              for r in resp.retrieved)
+            suspect_ref = (not refused) and grounded and heading_hit
             res = CaseResult(
                 case_id=case.id, type=case.type, split=case.split, question=case.question, expected_behavior="refuse",
                 answer=resp.answer, refused=refused, citations=resp.citations, retrieved_sources=retrieved_sources, tool_calls=resp.tool_calls,
                 contract_ok=resp.contract_ok, refusal_ok=refusal_ok, fact_recall=1.0, grounded=grounded, unsupported_numbers=unsupported,
                 cited_expected=True, retrieval_hit=True, passed=passed, judge_method="deterministic", latency_s=resp.latency_s,
+                suspected_eval_defect=suspect_ref and not passed,
             )
             return res
 
@@ -104,7 +132,11 @@ class Judge:
         cited_expected = (not case.expected_sources) or bool(set(case.expected_sources) & set(resp.citations)) or case.type == "tool"
         grounded = not unsupported
         passed = (not refused) and recall >= need - 1e-9 and grounded and resp.contract_ok and cited_expected
-        suspect = bool(missing) and not refused and grounded and set(missing) <= getattr(self, "llm_believed", set())
+        suspect = bool(missing) and not refused and grounded and (
+            set(missing) <= getattr(self, "llm_believed", set())
+            # deterministic signs of a bad test, not a bad answer: every missing fact is unrelated to the question,
+            # or is only a document title or code rather than a fact
+            or all(_off_topic(f, case.question) or _doc_reference(f) for f in missing))
         return CaseResult(
             case_id=case.id, type=case.type, split=case.split, question=case.question, expected_behavior="answer",
             answer=resp.answer, refused=refused, citations=resp.citations, retrieved_sources=retrieved_sources, tool_calls=resp.tool_calls,

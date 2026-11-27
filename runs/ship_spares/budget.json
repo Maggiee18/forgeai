@@ -1,31 +1,10 @@
 {
   "max_tokens": 600000,
-  "tokens_used": 35042,
-  "prompt_tokens": 31111,
-  "completion_tokens": 3931,
-  "llm_calls": 41,
-  "cached_calls": 185,
-  "elapsed_seconds": 229.5,
-  "by_stage": {
-    "judge_selftest": {
-      "tokens": 4029,
-      "calls": 8
-    },
-    "tournament": {
-      "tokens": 1822,
-      "calls": 2
-    },
-    "eval_iter0": {
-      "tokens": 2029,
-      "calls": 3
-    },
-    "optimize_1": {
-      "tokens": 514,
-      "calls": 1
-    },
-    "eval_iter1": {
-      "tokens": 26648,
-      "calls": 27
-    }
-  }
+  "tokens_used": 0,
+  "prompt_tokens": 0,
+  "completion_tokens": 0,
+  "llm_calls": 0,
+  "cached_calls": 226,
+  "elapsed_seconds": 0.6,
+  "by_stage": {}
 }

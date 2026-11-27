@@ -25,7 +25,8 @@ Without the secret the app still starts, in clearly labelled **mock mode**: the 
 builds run on the deterministic offline stand-in instead of a real model.
 
 Notes
-- Free CPU Spaces sleep after inactivity; the first request after sleep takes about 30 seconds.
+- Free CPU Spaces now need a PRO plan for new accounts (mid 2026 change); see RENDER.md for the free alternative.
+- Spaces sleep after inactivity; the first request after sleep takes about 30 seconds.
 - Builds made on the Space are written inside the container and are lost when it restarts. Commit runs you want to keep.
 - Embeddings use WordLlama, which ships inside its pip package, so nothing is downloaded at runtime.
 

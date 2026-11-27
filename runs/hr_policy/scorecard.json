@@ -49,7 +49,7 @@
         "prompt_defect": 2
       },
       "suspected_eval_defects": 0,
-      "avg_latency_s": 4.16
+      "avg_latency_s": 0.0
     },
     "decision": "baseline"
   },
@@ -103,7 +103,7 @@
         "prompt_defect": 0
       },
       "suspected_eval_defects": 0,
-      "avg_latency_s": 8.75
+      "avg_latency_s": 0.0
     },
     "decision": "kept"
   }

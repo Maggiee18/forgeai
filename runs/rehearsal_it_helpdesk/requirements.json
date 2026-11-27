@@ -1,0 +1,407 @@
+{
+  "agent_name": "corvane-it-assistant",
+  "purpose": "Provide quick, policy‑based IT helpdesk support for Corvane Analytics employees in Bengaluru and Pune.",
+  "scope": "Answers are sourced exclusively from the supplied IT policies, device catalogue, and service desk guide. Live ticket or outage data is not available; the assistant will direct users to the Service Desk for such information.",
+  "audience": "All employees, interns, and contractors of Corvane Analytics in Bengaluru and Pune.",
+  "tone": "Friendly yet professional, concise and practical.",
+  "must_answer_topics": [
+    "password reset",
+    "phishing email",
+    "lost laptop",
+    "raise ticket",
+    "ticket status",
+    "system outage",
+    "hardware request",
+    "software request",
+    "accessory request",
+    "monitor request"
+  ],
+  "must_refuse_topics": [
+    "detailed troubleshooting",
+    "non‑IT HR queries",
+    "legal advice",
+    "personal data requests",
+    "live ticket updates",
+    "live outage monitoring",
+    "external vendor support"
+  ],
+  "tool_needs": [],
+  "clarifications": [
+    {
+      "question": "Who are the primary users of the assistant (e.g., all employees, contractors, interns) and are there any role‑specific restrictions on accessing certain information?",
+      "why": "Clarifies user scope and ensures policy compliance for different user groups.",
+      "answer": "All employees, interns, and contractors in Bengaluru and Pune.",
+      "source": "assumed"
+    },
+    {
+      "question": "What tone and style should the assistant adopt (formal, friendly, concise, etc.)?",
+      "why": "Ensures consistent user experience and aligns with corporate communication guidelines.",
+      "answer": "Friendly yet professional, concise and practical.",
+      "source": "assumed"
+    },
+    {
+      "question": "Which topics are explicitly out of scope for the assistant (e.g., detailed troubleshooting, non‑IT HR queries, or legal advice)?",
+      "why": "Prevents the assistant from attempting unsupported answers and reduces risk of misinformation.",
+      "answer": "Anything not covered in the IT policies, device catalogue, or service desk guide.",
+      "source": "assumed"
+    },
+    {
+      "question": "How should the assistant handle requests for items not listed in the device catalogue or for which the user lacks eligibility?",
+      "why": "Defines fallback logic for unsupported hardware/software requests and avoids incorrect approvals.",
+      "answer": "Inform the user that the item is unavailable or not eligible and direct them to the Service Desk for a business case.",
+      "source": "assumed"
+    },
+    {
+      "question": "What is the expected method for providing live status of open tickets and system outages (e.g., integration with ticketing system, real‑time monitoring feeds)?",
+      "why": "Determines technical integration needs and data sources for dynamic information.",
+      "answer": "No live system or integration is available. The assistant answers only from the supplied documents, says plainly when something needs live data or personal records, and points to the right team or channel.",
+      "source": "assumed"
+    }
+  ],
+  "groundability": [
+    {
+      "topic": "password reset",
+      "status": "supported",
+      "evidence": "Use self service password reset at the login screen; it needs the Corvane Authenticator app.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "phishing email",
+      "status": "supported",
+      "evidence": "Report suspicious emails with the Report Phishing button in Outlook.",
+      "sources": [
+        "Information_Security_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "lost laptop",
+      "status": "supported",
+      "evidence": "A lost or stolen laptop or phone must be reported to the Service Desk within 2 hours of discovery, by calling extension 4357 or the after hours line.",
+      "sources": [
+        "Information_Security_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "raise ticket",
+      "status": "supported",
+      "evidence": "Raise a ticket on the IT Self Service Portal, call extension 4357 (HELP), or email servicedesk@corvane.example.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "ticket status",
+      "status": "unsupported",
+      "evidence": "the brief asks for live data ('the live status of their open tickets'); documents describe procedures, not current state",
+      "sources": [],
+      "method": "live data rule (brief wording)"
+    },
+    {
+      "topic": "system outage",
+      "status": "unsupported",
+      "evidence": "the brief asks for live data ('whether any systems are down right now'); documents describe procedures, not current state",
+      "sources": [],
+      "method": "live data rule (brief wording)"
+    },
+    {
+      "topic": "hardware request",
+      "status": "supported",
+      "evidence": "Submit requests through the IT Self Service Portal under Request Hardware or Request Software. Include the catalogue item code, quantity and business reason. The quoted lead time starts when the last approval is given.",
+      "sources": [
+        "Hardware_and_Software_Requests.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "software request",
+      "status": "supported",
+      "evidence": "Submit requests through the IT Self Service Portal under Request Hardware or Request Software. Include the catalogue item code, quantity and business reason.",
+      "sources": [
+        "Hardware_and_Software_Requests.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "accessory request",
+      "status": "supported",
+      "evidence": "Accessories under INR 3,000, such as a mouse or keyboard, can be collected from the IT counter at either office without a portal request.",
+      "sources": [
+        "Hardware_and_Software_Requests.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "monitor request",
+      "status": "supported",
+      "evidence": "Each employee may have up to 2 external monitors.",
+      "sources": [
+        "Hardware_and_Software_Requests.pdf"
+      ],
+      "method": "llm + quote verification"
+    }
+  ],
+  "ungroundable_topics": [
+    "ticket status",
+    "system outage"
+  ],
+  "conflicts": [
+    {
+      "about": "Password change frequency",
+      "doc_a": "Information_Security_Policy.pdf",
+      "quote_a": "Passwords must be changed every 90 days; the system prompts you 7 days before expiry.",
+      "doc_b": "Hardware_and_Software_Requests.pdf",
+      "quote_b": "Passwords must then be changed every 60 days.",
+      "reason": "Both passages define the mandatory password rotation interval for the same organization's accounts, creating a contradiction where a user would receive two different deadlines (90 vs 60 days) for the same action. (second model openai/gpt-oss-20b agreed)",
+      "values": [
+        "60 days",
+        "7 days",
+        "90 days"
+      ]
+    }
+  ],
+  "conflict_checks": [
+    {
+      "doc_a": "Information_Security_Policy.pdf#c5",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c3",
+      "about": "Laptop management procedures",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees with lost or stolen laptops or phones",
+        "All employees regarding laptop allocation and refresh cycles"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c8",
+      "doc_b": "Information_Security_Policy.pdf#c12",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "employees regarding hardware and software requests",
+        "employees regarding information security policy violations"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Information_Security_Policy.pdf#c3",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c10",
+      "about": "Password change frequency",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": true,
+      "applies_to": [
+        "All employees with company accounts",
+        "New joiners"
+      ],
+      "outcome": "accepted",
+      "other_model": "openai/gpt-oss-20b",
+      "other_vote": true
+    },
+    {
+      "doc_a": "Information_Security_Policy.pdf#c7",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees working off the office network or abroad",
+        "Hardware and software requests"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Software installation and licensing",
+        "USB storage devices and personal device connectivity"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c7",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees accessing internal systems off the office network"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c3",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees using company accounts"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c12",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees violating security policies"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "IT_Service_Desk_Guide.pdf#c4",
+      "doc_b": "Information_Security_Policy.pdf#c5",
+      "about": "Service desk response and reporting requirements",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "IT service desk tickets categorized by priority levels 1-4",
+        "Employees who have lost or stolen laptops or phones"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c10",
+      "doc_b": "Information_Security_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "New joiners (regarding password and authenticator enrolment)",
+        "All employees (regarding USB devices, personal phones, and personal laptops)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c10",
+      "doc_b": "Information_Security_Policy.pdf#c7",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "New joiners and all employees regarding password management",
+        "Employees accessing internal systems off the office network"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c10",
+      "doc_b": "Information_Security_Policy.pdf#c12",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "New joiners (regarding password and app enrollment)",
+        "All employees/users of company devices and accounts (regarding security violations)"
+      ],
+      "outcome": "no conflict (decider)"
+    }
+  ],
+  "knowledge_sources": [
+    {
+      "doc": "Hardware_and_Software_Requests.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 414 words",
+      "covers": [
+        "Scope",
+        "Standard Laptop Entitlement",
+        "How to Request",
+        "Approvals",
+        "Software Requests",
+        "New Joiners",
+        "Accessories and Monitors",
+        "Returns and Exit",
+        "New Joiner Security Note"
+      ]
+    },
+    {
+      "doc": "IT_Service_Desk_Guide.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 419 words",
+      "covers": [
+        "How to Contact the Service Desk",
+        "Ticket Priorities",
+        "Response and Resolution Targets",
+        "Escalation",
+        "Password Resets and Account Unlocks",
+        "Ticket Updates and Closure",
+        "Major Incidents",
+        "Feedback"
+      ]
+    },
+    {
+      "doc": "Information_Security_Policy.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 559 words",
+      "covers": [
+        "Purpose and Scope",
+        "Passwords and Multi Factor Authentication",
+        "Locking and Device Care",
+        "Lost or Stolen Devices",
+        "Removable Media and Personal Devices",
+        "Remote Work and Networks",
+        "Data Classification",
+        "Email and Phishing",
+        "Software Installation",
+        "Security Incidents",
+        "Monitoring and Violations"
+      ]
+    },
+    {
+      "doc": "device_catalogue.csv",
+      "kind": "csv",
+      "size": "15 rows",
+      "covers": [
+        "item_code",
+        "item",
+        "category",
+        "eligible_roles",
+        "price_inr",
+        "lead_time_days",
+        "approval_level",
+        "in_stock"
+      ]
+    }
+  ],
+  "known_limitations": [
+    "Cannot answer: ticket status (not in the documents).",
+    "Cannot answer: system outage (not in the documents).",
+    "Documents contradict each other on Password change frequency; answers cite both versions.",
+    "Answers only from the supplied documents; no access to personal records or live systems."
+  ],
+  "uncertainties": [
+    "Assumed (nobody answered): Who are the primary users of the assistant (e.g., all employees, contractors, interns) and are there any role‑specific restrictions on accessing certain information? -> All employees, interns, and contractors in Bengaluru and Pune.",
+    "Assumed (nobody answered): What tone and style should the assistant adopt (formal, friendly, concise, etc.)? -> Friendly yet professional, concise and practical.",
+    "Assumed (nobody answered): Which topics are explicitly out of scope for the assistant (e.g., detailed troubleshooting, non‑IT HR queries, or legal advice)? -> Anything not covered in the IT policies, device catalogue, or service desk guide.",
+    "Assumed (nobody answered): How should the assistant handle requests for items not listed in the device catalogue or for which the user lacks eligibility? -> Inform the user that the item is unavailable or not eligible and direct them to the Service Desk for a business case.",
+    "Assumed (nobody answered): What is the expected method for providing live status of open tickets and system outages (e.g., integration with ticketing system, real‑time monitoring feeds)? -> No live system or integration is available. The assistant answers only from the supplied documents, says plainly when something needs live data or personal records, and points to the right team or channel."
+  ],
+  "flags": [
+    "'ticket status' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "'system outage' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "Conflicting information on Password change frequency: Information_Security_Policy.pdf says \"Passwords must be changed every 90 days; the system prompts you 7 days before expiry.\" while Hardware_and_Software_Requests.pdf says \"Passwords must then be changed every 60 days.\". The agent will present both and suggest confirming with the document owner."
+  ],
+  "recommendations": [
+    "Either add a source document covering 'ticket status' or remove it from the scope.",
+    "Either add a source document covering 'system outage' or remove it from the scope.",
+    "Ask the document owners which rule on Password change frequency is current, and fix the outdated document."
+  ],
+  "approved": true,
+  "approval_note": "human checkpoint disabled (unattended run)"
+}

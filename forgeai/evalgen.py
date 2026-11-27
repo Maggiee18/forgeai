@@ -16,7 +16,7 @@ import random
 import re
 
 from . import prompts
-from .docs import Document
+from .docs import Document, headings
 from .guard import check_topic
 from .llm import LLMClient
 from .retrieval import Chunk, chunk_documents, default_index
@@ -250,12 +250,17 @@ class EvalGenerator:
                 break
             if self._dup(q):
                 continue
+            # a section heading naming the question's topic means the documents do cover it ("Remote Work and
+            # Networks" vs "where is the remote work policy?"), whatever the topic check says
+            head = next((h for d in self.docs for h in headings(d)
+                         if len(tokens(re.sub(r"^\d+[.)]?\s*", "", h))) >= 2 and content_overlap(re.sub(r"^\d+[.)]?\s*", "", h), q) >= 0.6), None)
+            if head:
+                self._reject("out_of_scope", q, f"a section heading covers it ('{head}'); not a valid refusal case")
+                continue
             chk = check_topic(q, self.all_index, self.llm)
             if chk.status == "supported":
                 self._reject("out_of_scope", q, f"documents actually answer this ({chk.sources}); not a valid refusal case")
                 continue
-            from .textutil import content_overlap
-
             topic = max(self.req.must_refuse_topics, key=lambda t: content_overlap(t, q), default="")
             reason = (f"falls under must-refuse topic '{topic}'" if topic and content_overlap(topic, q) >= 0.5 else "outside the assistant's scope")
             reason += f"; documents do not answer it (guard: {chk.status})"

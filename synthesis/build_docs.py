@@ -30,6 +30,7 @@ def to_pdf(md: Path, out: Path):
 PLAN = {
     "demos/hr_policy/docs": {"leave_policy.md": "Leave_Policy_Shore_Staff.pdf", "travel_policy.md": "Travel_and_Expense_Policy.pdf", "conduct_grievance.md": "Code_of_Conduct_and_Grievance.pdf"},
     "demos/hr_policy/docs_v2": {"leave_policy_2027.md": "Leave_Policy_Shore_Staff.pdf", "travel_policy.md": "Travel_and_Expense_Policy.pdf", "conduct_grievance.md": "Code_of_Conduct_and_Grievance.pdf"},
+    "rehearsal/it_helpdesk/docs": {"it_security_policy.md": "Information_Security_Policy.pdf", "service_desk_guide.md": "IT_Service_Desk_Guide.pdf", "hardware_software_requests.md": "Hardware_and_Software_Requests.pdf", "device_catalogue.csv": "device_catalogue.csv"},
     "demos/ship_spares/docs": {"poseidon_terms.md": "Supplier_Terms_Poseidon_Marine.pdf", "harbourline_terms.md": "Supplier_Terms_Harbourline_Spares.pdf", "procurement_procedure.md": "Spares_Procurement_Procedure.pdf", "spares_catalogue.csv": "spares_catalogue.csv"},
 }
 

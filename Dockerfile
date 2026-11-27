@@ -14,6 +14,7 @@ RUN pip install -r requirements.txt
 COPY forgeai/ forgeai/
 COPY prompts/ prompts/
 COPY demos/ demos/
+COPY rehearsal/ rehearsal/
 COPY baseline/ baseline/
 COPY runs/ runs/
 COPY --from=web /web/dist web/dist
@@ -22,4 +23,5 @@ RUN useradd -m -u 1000 app && chown -R app /app
 USER app
 EXPOSE 7860
 # GROQ_API_KEY comes from the Space's secrets. Without it the app runs in clearly labelled mock mode.
-CMD ["uvicorn", "forgeai.server:app", "--host", "0.0.0.0", "--port", "7860"]
+# Render (and most hosts) pass the port in $PORT; Hugging Face uses 7860.
+CMD ["sh", "-c", "uvicorn forgeai.server:app --host 0.0.0.0 --port ${PORT:-7860}"]

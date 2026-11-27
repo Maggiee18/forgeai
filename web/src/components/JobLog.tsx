@@ -27,7 +27,15 @@ export function useJob(jobId: string | null, onDone?: (j: Job) => void) {
           }
           return;
         }
-      } catch {
+      } catch (e) {
+        // the server restarted (free hosting sleeps when idle) and forgot this job: stop polling and say so
+        if (String((e as Error)?.message || "").includes("job not found")) {
+          const lost: Job = { id: jobId, state: "failed", kind: "", log: [], next: 0, result: null, elapsed_s: 0,
+            error: "The server restarted while this ran (free hosting sleeps after about 15 minutes without visitors), so the job was lost. Please start it again." };
+          setJob(lost);
+          if (!done.current) { done.current = true; onDone?.(lost); }
+          return;
+        }
         /* transient network error: keep polling */
       }
       timer = window.setTimeout(tick, 1200);

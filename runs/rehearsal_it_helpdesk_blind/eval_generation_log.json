@@ -1,0 +1,152 @@
+{
+  "accepted": 25,
+  "rejected": [
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If a hardware request is worth INR 30,000, who must approve it and how many business days do they have to act before escalation?",
+        "fact": "Requests from INR 25,000 up to INR 1,00,000 also need the IT Operations Manager"
+      },
+      "reason": "fact not required by the question: background range not needed for 30k request"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If an outage affects 30 users, how often will the Service Desk post updates and how long will it take to receive a closure note with the root cause?",
+        "fact": "major incident"
+      },
+      "reason": "fact not required by the question: not asked"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "What is the procedure for contacting the IT Service Desk outside of its regular hours?",
+        "fact": "Service Desk is staffed from 8:00 to 20:00 IST, Monday to Saturday"
+      },
+      "reason": "fact not required by the question: Regular hours are background info not needed for the outside-hours procedure"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If I lose my company laptop, what steps must I take before a replacement is issued?",
+        "fact": "extension 4357"
+      },
+      "reason": "fact not required by the question: Irrelevant to the question"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What steps should I take to report a lost laptop after 8:00 PM on a Saturday?",
+        "fact": "Outside these hours, an after hours line handles Priority 1 incidents only."
+      },
+      "reason": "fact not required by the question: Background about priority handling not asked"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If a security incident occurs during a major outage affecting more than 25 users, how should it be reported and what is the reporting timeline?",
+        "fact": "major incident"
+      },
+      "reason": "fact not required by the question: question already specifies major outage"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If a security incident occurs during a major outage affecting more than 25 users, how should it be reported and what is the reporting timeline?",
+        "fact": "posts updates on the IT Status page every 30 minutes"
+      },
+      "reason": "fact not required by the question: updates not requested"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "If a security incident occurs during a major outage affecting more than 25 users, how should it be reported and what is the reporting timeline?",
+        "facts_a": [
+          "major incident",
+          "posts updates on the IT Status page every 30 minutes"
+        ],
+        "facts_b": [
+          "must be reported to security@corvane.example or the Service Desk within 30 minutes of discovery"
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If a suspected security incident is reported within 30 minutes, what is the Service Desk’s response time?",
+        "fact": "Priority 1: response within 15 minutes"
+      },
+      "reason": "fact not required by the question: The question asks for the response time when a suspected incident is reported within 30 minutes, but does not specify the incident’s priority. Therefore, the specific response time for Priority 1 is not required."
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "If a suspected security incident is reported within 30 minutes, what is the Service Desk’s response time?",
+        "facts_a": [
+          "Priority 1: response within 15 minutes"
+        ],
+        "facts_b": [
+          "Any suspected security incident must be reported to security@corvane.example or the Service Desk within 30 minutes of discovery."
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What priority level is assigned if you click a link in a suspicious email?",
+        "fact": "Priority 1 (Critical): a security incident or outage stopping a whole team or client delivery."
+      },
+      "reason": "fact not required by the question: definition not needed"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "What priority level is assigned if you click a link in a suspicious email?",
+        "facts_a": [
+          "Priority 1 (Critical): a security incident or outage stopping a whole team or client delivery."
+        ],
+        "facts_b": [
+          "Clicking a link or entering credentials triggers a Priority 1 security incident."
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If you forget your password and your laptop locks after 5 minutes, how do you regain access?",
+        "fact": "Accounts lock after 10 failed sign in attempts and unlock automatically after 30 minutes."
+      },
+      "reason": "fact not required by the question: irrelevant to immediate unlock"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If you forget your password and your laptop locks after 5 minutes, how do you regain access?",
+        "fact": "Laptops lock automatically after 5 minutes of inactivity."
+      },
+      "reason": "fact not required by the question: already stated in question"
+    },
+    {
+      "type": "cross_doc",
+      "candidate": {
+        "q": "If you forget your password and your laptop locks after 5 minutes, how do you regain access?",
+        "facts_a": [
+          "Use self service password reset at the login screen; it needs the Corvane Authenticator app.",
+          "Accounts lock after 10 failed sign in attempts and unlock automatically after 30 minutes."
+        ],
+        "facts_b": [
+          "Laptops lock automatically after 5 minutes of inactivity."
+        ]
+      },
+      "reason": "needs a verified fact from each document"
+    },
+    {
+      "type": "ambiguous",
+      "candidate": "What's the SLA for P1 incidents?",
+      "reason": "rewrite changed numbers in the question"
+    }
+  ]
+}

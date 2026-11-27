@@ -1,0 +1,81 @@
+[
+  {
+    "iteration": 1,
+    "from_version": 0,
+    "to_version": 1,
+    "dev_before": 0.857,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 2
+    },
+    "changes": [
+      {
+        "category": "prompt_defect",
+        "target": "prompt.style",
+        "before": "Friendly yet professional, concise, practical. Provide 2‑4 sentence explanations, mention conditions or exceptions. Format responses in the required JSON structure.",
+        "after": "Friendly yet professional, concise, practical. Provide 2‑4 sentence explanations, mention conditions or exceptions. Ensure all key facts from the passage are included; if a fact is marked as \"pre‑approved\" or similar, explicitly state it. Avoid truncation—use full sentences or a brief list if necessary. Format responses in the required JSON structure.",
+        "rationale": "Adds explicit rule to include all key facts and avoid truncation, addressing missed facts like \"pre approved\".",
+        "addressed_cases": [
+          "ans-04",
+          "amb-03"
+        ],
+        "fixed_cases": []
+      },
+      {
+        "category": "wrong_refusal",
+        "target": "prompt.refusal",
+        "before": "Refuse on any non‑IT HR, legal, personal data, live ticket or outage queries, or when the topic is not covered in the documents. Respond politely and suggest contacting the Service Desk if a name is provided.\nThe documents do NOT cover the following, so never answer them from memory; say they are not covered and set refused to true: ticket status; system outage.\nAlways refuse: detailed troubleshooting; non‑IT HR queries; legal advice; personal data requests; live ticket updates; live outage monitoring; external vendor support.",
+        "after": "Refuse on any non‑IT HR, legal, personal data, live ticket or outage queries, or when the topic is not covered in the documents. Respond politely and suggest contacting the Service Desk if a name is provided.\nThe documents do NOT cover the following, so never answer them from memory; say they are not covered and set refused to true: ticket status; system outage.\nAlways refuse: detailed troubleshooting; non‑IT HR queries; legal advice; personal data requests; live ticket updates; live outage monitoring; external vendor support.\nAdditions:\n- If the question asks for a future event or schedule that is not explicitly stated in the excerpts, refuse.\n- If the user requests a specific policy or procedure not present in the documents, refuse.\n- If the user asks for personal or sensitive information about an employee, refuse.",
+        "rationale": "Adds explicit refusal for future events, missing policies, and personal data to prevent over‑refusal of valid questions.",
+        "addressed_cases": [
+          "amb-02"
+        ],
+        "fixed_cases": []
+      }
+    ],
+    "newly_broken": [
+      "cro-02"
+    ],
+    "newly_fixed": [],
+    "dev_after": 0.81,
+    "holdout_after": 1.0,
+    "decision": "reverted (dev score did not improve)"
+  },
+  {
+    "iteration": 2,
+    "from_version": 0,
+    "to_version": 2,
+    "dev_before": 0.857,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 2
+    },
+    "changes": [
+      {
+        "category": "prompt_defect",
+        "target": "-",
+        "skipped": "an earlier fix for this category was reverted; not retrying the same targeted fix",
+        "addressed_cases": [
+          "ans-04",
+          "amb-03"
+        ]
+      },
+      {
+        "category": "wrong_refusal",
+        "target": "-",
+        "skipped": "an earlier fix for this category was reverted; not retrying the same targeted fix",
+        "addressed_cases": [
+          "amb-02"
+        ]
+      }
+    ],
+    "decision": "no change",
+    "stop_reason": "optimizer found no applicable targeted fix"
+  }
+]

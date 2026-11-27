@@ -34,6 +34,36 @@ def _tool_can_serve(topic: str) -> str | None:
     return None
 
 
+# Wording in the BRIEF that asks for live or personal-record data. The requirements writer (a small model) can
+# shorten "whether any systems are down right now" to "system outage status", which a document about outage
+# procedures then appears to support. So the guard reads the brief's own words too, not only the topic list.
+LIVE_CUE = re.compile(r"\b(live|real[- ]time|right now|at the moment|currently|up[- ]to[- ]the[- ]minute|today'?s|"
+                      r"status of (?:my|their|your|our|his|her)|(?:my|their|your) (?:open|own|personal) )", re.I)
+_LEAD = re.compile(r"^(?:it|the (?:assistant|agent|bot))?\s*(?:should|must|can|will|needs? to)?\s*(?:also\s+)?"
+                   r"(?:be able to\s+)?(?:tell|give|show|quote|provide|report|say|share|display|check)?\s*"
+                   r"(?:employees|users|staff|people|them|us|me|customers)?\s*(?:about\s+)?", re.I)
+
+
+_STATE = re.compile(r"\b(status|outages?|down|downtime|uptime|availability|balance|queue|position|incidents?|rates?)\b", re.I)
+
+
+def brief_live_needs(brief: str) -> list[str]:
+    """Clauses of the brief that ask for live data or personal records, unless a registry tool can serve them
+    (today's date, a computation over document data)."""
+    out = []
+    for sent in re.split(r"(?<=[.!?])\s+", brief or ""):
+        for part in re.split(r",|;|\band\b(?= (?:whether|if|what|which|how|when|the|their|any)\b)", sent):
+            part = part.strip(" .")
+            if not part or not LIVE_CUE.search(part):
+                continue
+            if _tool_can_serve(part) or any(rx.search(part) for rx in COMPUTE.values()):
+                continue
+            need = _LEAD.sub("", part).strip(" .") or part
+            if len(tokens(need)) >= 2:
+                out.append(need)
+    return list(dict.fromkeys(out))
+
+
 COMPUTE = {
     "calculator": re.compile(r"\b(calculat\w*|totals?|sum|discount\w*|price calculation|cost estimat\w*|order value|multipl\w*|pro.?rat\w*)\b", re.I),
     "current_date": re.compile(r"\b(delivery (date|estimate)|estimated delivery|lead.?time|days from (now|today)|due date|expected (date|delivery)|arrival date)\b", re.I),
@@ -97,7 +127,17 @@ def _same_scope(a: str, b: str) -> bool:
     ta, tb = set(tokens(a)), set(tokens(b))
     if not ta or not tb:
         return True  # model gave no scope; the quote and value checks still apply
-    return len(ta & tb) / min(len(ta), len(tb)) > 0.5
+    if len(ta & tb) / min(len(ta), len(tb)) > 0.5:
+        return True
+    # a universal scope ('all employees', 'everyone with a company account') contains any narrower group of
+    # people ('new joiners'), unless the other side names a specific organisation (two suppliers' terms differ
+    # legitimately). A proper noun = a capitalised word after the first.
+    def universal(x: str) -> bool:
+        return bool(re.match(r"\s*(all|every|everyone|any|each)\b", x, re.I))
+
+    def named(x: str) -> bool:
+        return any(w[:1].isupper() for w in x.split()[1:])
+    return (universal(a) and not named(b)) or (universal(b) and not named(a))
 
 
 def find_conflicts(req: Requirements, index, llm: LLMClient, max_checks: int = 12, log=print, verifier: LLMClient | None = None, checks: list | None = None) -> list[Conflict]:
@@ -221,13 +261,41 @@ def knowledge_sources(docs: list[Document]) -> list[KnowledgeSource]:
     return out
 
 
-def run_guard(req: Requirements, docs: list[Document], llm: LLMClient, log=print, index=None, verifier: LLMClient | None = None) -> Requirements:
+def run_guard(req: Requirements, docs: list[Document], llm: LLMClient, log=print, index=None, verifier: LLMClient | None = None, brief: str = "") -> Requirements:
     index = index or default_index(docs)
     checks = []
     for topic in req.must_answer_topics:
         c = check_topic(topic, index, llm)
         checks.append(c)
         log(f"    groundability  {c.status:<11} {topic}")
+    # the brief's own wording: a live-data request can never be "supported" by a document quote
+    for need in brief_live_needs(brief):
+        def same_need(topic: str) -> bool:
+            # one shared word is not enough ('raise ticket' is a procedure, not 'the live status of open tickets'),
+            # unless the topic itself names a state that changes from moment to moment
+            shared = set(tokens(topic)) & set(tokens(need))
+            if not (content_overlap(topic, need) >= 0.5 or content_overlap(need, topic) >= 0.5):
+                return False
+            return len(shared) >= 2 or bool(_STATE.search(topic))
+
+        def already_flagged(c) -> bool:
+            # the same gap already found unsupported under a shorter name ('freight quote' vs 'live freight rates')
+            return c.status == "unsupported" and bool(set(tokens(c.topic)) & set(tokens(need)))
+        if any(already_flagged(c) for c in checks):
+            continue
+        match = [c for c in checks if same_need(c.topic)]
+        if match:
+            for c in match:
+                if c.status != "unsupported":
+                    log(f"    groundability  overruled   {c.topic}  (brief asks for live data: '{need}')")
+                    c.status, c.sources = "unsupported", []
+                    c.evidence = f"the brief asks for live data ('{need}'); documents describe procedures, not current state"
+                    c.method = "live data rule (brief wording)"
+        else:
+            checks.append(TopicCheck(topic=need, status="unsupported", evidence="the brief asks for live data or personal records; no document or registry tool provides it",
+                                     method="live data rule (brief wording)"))
+            req.must_answer_topics.append(need)
+            log(f"    groundability  unsupported {need}  (from the brief's wording; the requirements had dropped it)")
     flags, limits, recs = [], [], []
     for need in req.tool_needs:
         tool = _tool_can_serve(need)

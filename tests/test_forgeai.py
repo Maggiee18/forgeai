@@ -388,15 +388,100 @@ def test_shorthand_thousands_are_the_same_number():
     assert numbers("thresholds 15k and 2.5k") == numbers("USD 15,000 and USD 2,500")
 
 
-def test_regression_replays_shipped_agent_and_finds_document_changes(tmp_path, monkeypatch):
+def test_regression_regenerates_and_replays_and_finds_document_changes(tmp_path, monkeypatch):
     monkeypatch.setenv("FORGE_CACHE", str(tmp_path / "cache"))
     cfg = Config(backend="mock", model="mock", interactive=False, answers_file=str(ROOT / "demos/hr_policy/answers.yaml"), max_iterations=1, tournament=False)
     f = Factory(cfg, mock_fn=mock_llm, log=lambda *a: None)
     f.build(str(ROOT / "demos/hr_policy/brief.txt"), str(ROOT / "demos/hr_policy/docs"), str(tmp_path / "hr"))
     shipped = json.loads((tmp_path / "hr" / "agent_definition.json").read_text())
     out = f.regress(str(tmp_path / "hr"), str(ROOT / "demos/hr_policy/docs_v2"), str(tmp_path / "reg"))
-    replay = json.loads((tmp_path / "reg" / "agent_definition.json").read_text())
+    replay = json.loads((tmp_path / "reg" / "agent_definition.replayed.json").read_text())
     assert replay["system_prompt_sections"] == shipped["system_prompt_sections"] and replay["version"] == shipped["version"]
+    regen = json.loads((tmp_path / "reg" / "agent_definition.regenerated.json").read_text())
+    assert regen["version"] == 0 and regen["docs_folder"] == replay["docs_folder"]
+    assert {"pass_rate", "broke", "newly_passing"} <= set(out["regenerated"]) and {"pass_rate", "broke"} <= set(out["replayed"])
+    assert "Regenerated agent" in (tmp_path / "reg" / "REGRESSION.md").read_text()
     changed = " ".join(c["old"] + " " + c["new"] for c in out["document_changes"])
     assert "21 days of annual leave" in changed and "24 days of annual leave" in changed
     assert "Uncovered" in (tmp_path / "reg" / "REGRESSION.md").read_text() or "no existing test covers" in (tmp_path / "reg" / "REGRESSION.md").read_text() or all(c["covered_by"] for c in out["document_changes"])
+
+
+# --- found by the blind rehearsal (runs/rehearsal_it_helpdesk_blind) --------------------------------------
+def test_brief_wording_live_data_is_found_even_if_requirements_dropped_it():
+    from forgeai.guard import brief_live_needs
+    it = (ROOT / "rehearsal/it_helpdesk/brief.txt").read_text()
+    needs = brief_live_needs(it)
+    assert any("open tickets" in n for n in needs) and any("right now" in n for n in needs)
+    # tool-servable or document-only briefs are left alone
+    assert brief_live_needs((ROOT / "demos/hr_policy/brief.txt").read_text()) == []
+    assert brief_live_needs("Estimate the delivery date from today using the lead time.") == []
+
+
+def test_live_need_from_brief_overrules_a_document_supported_topic(monkeypatch):
+    from forgeai.guard import run_guard
+    from forgeai.schemas import Requirements, TopicCheck
+    import forgeai.guard as g
+    docs = load_folder(str(ROOT / "rehearsal/it_helpdesk/docs"))
+    req = Requirements(agent_name="x", purpose="p", scope="s", audience="a", tone="t",
+                       must_answer_topics=["live ticket status", "password rules"], must_refuse_topics=["a", "b"])
+    monkeypatch.setattr(g, "check_topic", lambda topic, index, llm: TopicCheck(topic=topic, status="supported", evidence="q", sources=["d"], method="stub"))
+    monkeypatch.setattr(g, "find_conflicts", lambda *a, **k: [])
+    out = run_guard(req, docs, None, log=lambda *a: None, brief="It should tell employees the live status of their open tickets.")
+    status = {c.topic: c.status for c in out.groundability}
+    assert status["live ticket status"] == "unsupported" and status["password rules"] == "supported"
+
+
+def test_universal_scope_overlaps_a_subgroup_but_named_suppliers_do_not():
+    from forgeai.guard import _same_scope
+    assert _same_scope("All employees with company accounts", "New joiners")
+    assert not _same_scope("Poseidon Marine Supplies", "Harbourline Spares")
+
+
+def test_unattended_intake_never_assumes_an_integration():
+    from forgeai.intake import INTEGRATION, NO_INTEGRATION
+    assert INTEGRATION.search("What is the expected method for providing live status of open tickets?")
+    assert INTEGRATION.search("Use the existing ticketing system API")
+    assert "No live system" in NO_INTEGRATION
+
+
+def test_judge_flags_off_topic_and_title_facts_as_suspected_test_defects():
+    from forgeai.judge import _doc_reference, _off_topic
+    assert _off_topic("Licences unused for 60 days are reclaimed automatically",
+                      "How long does a security review for new software take before it can be installed?")
+    assert not _off_topic("Laptops lock automatically after 5 minutes of inactivity", "What should I do with my laptop when leaving my desk?")
+    assert _doc_reference("Software Request Procedure (IT-PRC-03)") and not _doc_reference("Compliance Officer")
+
+
+def test_live_need_does_not_overrule_a_procedure_sharing_one_word(monkeypatch):
+    from forgeai.guard import run_guard
+    from forgeai.schemas import Requirements, TopicCheck
+    import forgeai.guard as g
+    docs = load_folder(str(ROOT / "rehearsal/it_helpdesk/docs"))
+    req = Requirements(agent_name="x", purpose="p", scope="s", audience="a", tone="t",
+                       must_answer_topics=["raise ticket", "ticket status", "system outage"], must_refuse_topics=["a", "b"])
+    monkeypatch.setattr(g, "check_topic", lambda topic, index, llm: TopicCheck(topic=topic, status="supported", evidence="q", sources=["d"], method="stub"))
+    monkeypatch.setattr(g, "find_conflicts", lambda *a, **k: [])
+    out = run_guard(req, docs, None, log=lambda *a: None, brief=(ROOT / "rehearsal/it_helpdesk/brief.txt").read_text())
+    status = {c.topic: c.status for c in out.groundability}
+    assert status["raise ticket"] == "supported"
+    assert status["ticket status"] == "unsupported" and status["system outage"] == "unsupported"
+
+
+def test_numbered_steps_are_not_counted_as_unsupported_numbers():
+    from forgeai.judge import _LIST_MARKER
+    from forgeai.textutil import value_numbers
+    ans = "1. Photograph the item.\n2. Report it within 7 days.\n4) Keep the packaging."
+    assert value_numbers(_LIST_MARKER.sub(" ", ans)) == {"7"}
+
+
+def test_live_need_already_flagged_under_another_name_is_not_added_twice(monkeypatch):
+    from forgeai.guard import run_guard
+    from forgeai.schemas import Requirements, TopicCheck
+    import forgeai.guard as g
+    docs = load_folder(str(ROOT / "demos/ship_spares/docs"))
+    req = Requirements(agent_name="x", purpose="p", scope="s", audience="a", tone="t",
+                       must_answer_topics=["freight quote", "lead time"], must_refuse_topics=["a", "b"])
+    monkeypatch.setattr(g, "check_topic", lambda topic, index, llm: TopicCheck(topic=topic, status="unsupported" if "freight" in topic else "supported", evidence="", method="stub"))
+    monkeypatch.setattr(g, "find_conflicts", lambda *a, **k: [])
+    out = run_guard(req, docs, None, log=lambda *a: None, brief=(ROOT / "demos/ship_spares/brief.txt").read_text())
+    assert out.ungroundable_topics == ["freight quote"]

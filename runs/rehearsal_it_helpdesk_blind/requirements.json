@@ -1,0 +1,385 @@
+{
+  "agent_name": "corvane-it-assistant",
+  "purpose": "Provide quick, policy‑based answers to Corvane Analytics employees about IT support, device requests, and security, while directing unresolved issues to the Service Desk.",
+  "scope": "Answers are drawn solely from the IT Service Desk Guide, Hardware and Software Request Procedure, Information Security Policy, and the device catalogue. The assistant also reports live ticket status and system outages via the ticketing and monitoring APIs.",
+  "audience": "All employees, interns, and contractors in Bengaluru and Pune.",
+  "tone": "Friendly yet professional, concise and practical.",
+  "must_answer_topics": [
+    "password reset",
+    "phishing email",
+    "lost laptop",
+    "raise ticket",
+    "ticket response time",
+    "hardware request procedure",
+    "software request procedure",
+    "device catalogue prices",
+    "approval levels",
+    "system outage status"
+  ],
+  "must_refuse_topics": [
+    "detailed troubleshooting beyond policy",
+    "non‑IT HR queries",
+    "legal advice",
+    "personal data requests",
+    "requests for items not in catalogue",
+    "requests for non‑eligible roles",
+    "requests for external vendor information"
+  ],
+  "tool_needs": [
+    "lookup item in device catalogue",
+    "fetch ticket status from API",
+    "fetch system outage status from monitoring API"
+  ],
+  "clarifications": [
+    {
+      "question": "Who are the primary users of the assistant (e.g., all employees, contractors, interns) and are there any role‑specific restrictions on accessing certain information?",
+      "why": "Clarifies user scope and ensures policy compliance for different user groups.",
+      "answer": "All employees, interns, and contractors in Bengaluru and Pune.",
+      "source": "assumed"
+    },
+    {
+      "question": "What tone and style should the assistant adopt (formal, friendly, concise, etc.)?",
+      "why": "Ensures consistent user experience and aligns with corporate communication guidelines.",
+      "answer": "Friendly yet professional, concise and practical.",
+      "source": "assumed"
+    },
+    {
+      "question": "Which topics are explicitly out of scope for the assistant (e.g., detailed troubleshooting, non‑IT HR queries, or legal advice)?",
+      "why": "Prevents the assistant from attempting unsupported answers and reduces risk of misinformation.",
+      "answer": "Anything not covered in the IT policies, device catalogue, or service desk guide.",
+      "source": "assumed"
+    },
+    {
+      "question": "How should the assistant handle requests for items not listed in the device catalogue or for which the user lacks eligibility?",
+      "why": "Defines fallback logic for unsupported hardware/software requests and avoids incorrect approvals.",
+      "answer": "Inform the user that the item is unavailable or not eligible and direct them to the Service Desk for a business case.",
+      "source": "assumed"
+    },
+    {
+      "question": "What is the expected method for providing live status of open tickets and system outages (e.g., integration with ticketing system, real‑time monitoring feeds)?",
+      "why": "Determines technical integration needs and data sources for dynamic information.",
+      "answer": "Use the existing ticketing system API to fetch ticket status and a monitoring dashboard API for system outages.",
+      "source": "assumed"
+    }
+  ],
+  "groundability": [
+    {
+      "topic": "password reset",
+      "status": "supported",
+      "evidence": "Use self service password reset at the login screen; it needs the Corvane Authenticator app.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "phishing email",
+      "status": "supported",
+      "evidence": "Report suspicious emails with the Report Phishing button in Outlook.",
+      "sources": [
+        "Information_Security_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "lost laptop",
+      "status": "supported",
+      "evidence": "A lost or stolen laptop or phone must be reported to the Service Desk within 2 hours of discovery, by calling extension 4357 or the after hours line.",
+      "sources": [
+        "Information_Security_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "raise ticket",
+      "status": "supported",
+      "evidence": "Raise a ticket on the IT Self Service Portal, call extension 4357 (HELP), or email servicedesk@corvane.example.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "ticket response time",
+      "status": "supported",
+      "evidence": "Priority 1: response within 15 minutes, resolution target 4 hours, worked around the clock. Priority 2: response within 30 minutes, resolution target 8 business hours. Priority 3: response within 4 business hours, resolution target 3 business days. Priority 4: response within 1 business day, resolution target 10 business days.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "hardware request procedure",
+      "status": "supported",
+      "evidence": "Submit requests through the IT Self Service Portal under Request Hardware or Request Software. Include the catalogue item code, quantity and business reason.",
+      "sources": [
+        "Hardware_and_Software_Requests.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "software request procedure",
+      "status": "supported",
+      "evidence": "Anything not in the Company Portal must be requested under the Hardware and Software Request Procedure (IT-PRC-03) and pass a security review.",
+      "sources": [
+        "Information_Security_Policy.pdf"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "device catalogue prices",
+      "status": "supported",
+      "evidence": "price_inr: 2400",
+      "sources": [
+        "device_catalogue.csv"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "approval levels",
+      "status": "supported",
+      "evidence": "approval_level: reporting manager",
+      "sources": [
+        "device_catalogue.csv"
+      ],
+      "method": "llm + quote verification"
+    },
+    {
+      "topic": "system outage status",
+      "status": "supported",
+      "evidence": "For outages affecting more than 25 users, the Service Desk declares a major incident, posts updates on the IT Status page every 30 minutes and sends a closure note with the root cause within 5 business days.",
+      "sources": [
+        "IT_Service_Desk_Guide.pdf"
+      ],
+      "method": "llm + quote verification"
+    }
+  ],
+  "ungroundable_topics": [],
+  "conflicts": [],
+  "conflict_checks": [
+    {
+      "doc_a": "Information_Security_Policy.pdf#c5",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c3",
+      "about": "Laptop management procedures",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees with lost or stolen laptops or phones",
+        "All employees regarding laptop allocation and refresh cycles"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c2",
+      "doc_b": "Information_Security_Policy.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Corvane employees requesting hardware or software",
+        "Corvane employees with lost or stolen laptops or phones"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "IT_Service_Desk_Guide.pdf#c8",
+      "doc_b": "Information_Security_Policy.pdf#c7",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Service Desk (for outages affecting more than 25 users)",
+        "Employees (working off-network or abroad)"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Information_Security_Policy.pdf#c3",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c10",
+      "about": "Password change frequency",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": true,
+      "applies_to": [
+        "All employees with company accounts",
+        "New joiners"
+      ],
+      "outcome": "rejected: rules apply to different things"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Software installation and licensing",
+        "USB storage devices and personal device connectivity"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c7",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees accessing internal systems off the office network"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "IT_Service_Desk_Guide.pdf#c8",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Major IT incidents affecting more than 25 users",
+        "Hardware and software purchase requests"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c3",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees using company accounts"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c6",
+      "doc_b": "Information_Security_Policy.pdf#c12",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees requesting software installation",
+        "Employees violating security policies"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Information_Security_Policy.pdf#c7",
+      "doc_b": "Hardware_and_Software_Requests.pdf#c5",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "Employees working off the office network or abroad",
+        "Hardware and software requests"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "IT_Service_Desk_Guide.pdf#c4",
+      "doc_b": "Information_Security_Policy.pdf#c5",
+      "about": "Service desk response and reporting requirements",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "IT service desk tickets categorized by priority levels 1-4",
+        "Employees who have lost or stolen laptops or phones"
+      ],
+      "outcome": "no conflict (decider)"
+    },
+    {
+      "doc_a": "Hardware_and_Software_Requests.pdf#c10",
+      "doc_b": "Information_Security_Policy.pdf#c6",
+      "about": "N/A",
+      "decider": "qwen/qwen3.8-27b",
+      "decider_vote": false,
+      "applies_to": [
+        "New joiners (regarding password and authenticator enrolment)",
+        "All employees (regarding USB devices, personal phones, and personal laptops)"
+      ],
+      "outcome": "no conflict (decider)"
+    }
+  ],
+  "knowledge_sources": [
+    {
+      "doc": "Hardware_and_Software_Requests.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 414 words",
+      "covers": [
+        "Scope",
+        "Standard Laptop Entitlement",
+        "How to Request",
+        "Approvals",
+        "Software Requests",
+        "New Joiners",
+        "Accessories and Monitors",
+        "Returns and Exit",
+        "New Joiner Security Note"
+      ]
+    },
+    {
+      "doc": "IT_Service_Desk_Guide.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 419 words",
+      "covers": [
+        "How to Contact the Service Desk",
+        "Ticket Priorities",
+        "Response and Resolution Targets",
+        "Escalation",
+        "Password Resets and Account Unlocks",
+        "Ticket Updates and Closure",
+        "Major Incidents",
+        "Feedback"
+      ]
+    },
+    {
+      "doc": "Information_Security_Policy.pdf",
+      "kind": "pdf",
+      "size": "2 pages, 559 words",
+      "covers": [
+        "Purpose and Scope",
+        "Passwords and Multi Factor Authentication",
+        "Locking and Device Care",
+        "Lost or Stolen Devices",
+        "Removable Media and Personal Devices",
+        "Remote Work and Networks",
+        "Data Classification",
+        "Email and Phishing",
+        "Software Installation",
+        "Security Incidents",
+        "Monitoring and Violations"
+      ]
+    },
+    {
+      "doc": "device_catalogue.csv",
+      "kind": "csv",
+      "size": "15 rows",
+      "covers": [
+        "item_code",
+        "item",
+        "category",
+        "eligible_roles",
+        "price_inr",
+        "lead_time_days",
+        "approval_level",
+        "in_stock"
+      ]
+    }
+  ],
+  "known_limitations": [
+    "Answers only from the supplied documents; no access to personal records or live systems."
+  ],
+  "uncertainties": [
+    "Assumed (nobody answered): Who are the primary users of the assistant (e.g., all employees, contractors, interns) and are there any role‑specific restrictions on accessing certain information? -> All employees, interns, and contractors in Bengaluru and Pune.",
+    "Assumed (nobody answered): What tone and style should the assistant adopt (formal, friendly, concise, etc.)? -> Friendly yet professional, concise and practical.",
+    "Assumed (nobody answered): Which topics are explicitly out of scope for the assistant (e.g., detailed troubleshooting, non‑IT HR queries, or legal advice)? -> Anything not covered in the IT policies, device catalogue, or service desk guide.",
+    "Assumed (nobody answered): How should the assistant handle requests for items not listed in the device catalogue or for which the user lacks eligibility? -> Inform the user that the item is unavailable or not eligible and direct them to the Service Desk for a business case.",
+    "Assumed (nobody answered): What is the expected method for providing live status of open tickets and system outages (e.g., integration with ticketing system, real‑time monitoring feeds)? -> Use the existing ticketing system API to fetch ticket status and a monitoring dashboard API for system outages."
+  ],
+  "flags": [],
+  "recommendations": [],
+  "approved": true,
+  "approval_note": "human checkpoint disabled (unattended run)"
+}

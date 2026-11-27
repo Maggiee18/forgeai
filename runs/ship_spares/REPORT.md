@@ -44,7 +44,7 @@ Holdout cases were never shown to the optimizer. A gap between dev and holdout i
 
 | Variant | Dev subset pass rate | System prompt chars | Tokens spent | Winner |
 |---|---|---|---|---|
-| strict | 100% | 1832 | 1822 |  |
+| strict | 100% | 1832 | 0 |  |
 | helpful | 100% | 1808 | 0 | ✅ |
 
 Winner chosen by pass rate on a stratified dev subset (no pairwise LLM verdicts, so no position bias); ties go to the shorter (cheaper) system prompt.
@@ -85,6 +85,6 @@ The model refused when the answer was present, or answered something it should h
 - Key facts are short string facts. An answer that is correct but phrased with different numbers formatting (e.g. 'two weeks' vs '14 days') can be marked wrong; check the failure list above for such cases.
 - Out-of-scope cases are only as hard as the generator made them; adversarial prompts (jailbreaks) are not covered.
 - Tool cases are computed exactly in Python, but only the first CSV is sampled.
-- Budget used: 35042 tokens across 41 model calls (185 served from cache), 229.5 s.
+- Budget used: 0 tokens across 0 model calls (226 served from cache), 0.6 s.
 
 Note: later iterations were reverted, so the shipped definition is v0; every score above the iteration table is for that version.

@@ -70,6 +70,14 @@ def ask_questions(brief: str, docs: list[Document], llm: LLMClient) -> list[dict
     return llm.json(prompts.messages("intake_questions", brief=brief, inventory=inventory_text(docs)), validator=validate)
 
 
+# Unattended, nobody can confirm that a ticketing API, HR system or live feed exists, so an assumed answer must
+# never grant one: a small model's "safest default" once invented "use the existing ticketing system API".
+INTEGRATION = re.compile(r"\b(api|apis|integrat\w*|connect\w*|live|real[- ]time|system access|database|portal data|"
+                         r"ticketing system|hrms data|crm|erp|feed|webhook|sync\w*|fetch\w*)\b", re.I)
+NO_INTEGRATION = ("No live system or integration is available. The assistant answers only from the supplied documents, says "
+                  "plainly when something needs live data or personal records, and points to the right team or channel.")
+
+
 def interview(brief: str, docs: list[Document], llm: LLMClient, interactive: bool, answers_file: str | None, log=print, index=None) -> list[Clarification]:
     from .guard import check_topic
     from .retrieval import default_index
@@ -104,7 +112,10 @@ def interview(brief: str, docs: list[Document], llm: LLMClient, interactive: boo
             if reply:
                 out.append(Clarification(question=q["question"], why=q["why"], answer=reply, source="requester"))
                 continue
-        out.append(Clarification(question=q["question"], why=q["why"], answer=q["default_answer"] or "No preference; use a conservative default.", source="assumed"))
+        default = q["default_answer"] or "No preference; use a conservative default."
+        if INTEGRATION.search(q["question"]) or INTEGRATION.search(default):
+            default = NO_INTEGRATION  # never assume a capability nobody confirmed
+        out.append(Clarification(question=q["question"], why=q["why"], answer=default, source="assumed"))
     return out
 
 

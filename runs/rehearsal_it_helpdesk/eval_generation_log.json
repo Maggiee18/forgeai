@@ -1,0 +1,82 @@
+{
+  "accepted": 29,
+  "rejected": [
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If a hardware request is worth INR 30,000, who must approve it and how many business days do they have to act before escalation?",
+        "fact": "Requests from INR 25,000 up to INR 1,00,000 also need the IT Operations Manager"
+      },
+      "reason": "fact not required by the question: background range not needed for 30k request"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If an outage affects 30 users, how often will the Service Desk post updates and how long will it take to send a closure note with the root cause?",
+        "fact": "major incident"
+      },
+      "reason": "fact not required by the question: not specified by question"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "How often are laptops refreshed for employees at Corvane Analytics?",
+        "fact": "one standard laptop"
+      },
+      "reason": "fact not required by the question: not about refresh frequency"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "How often are laptops refreshed for employees at Corvane Analytics?",
+        "fact": "performance laptop"
+      },
+      "reason": "fact not required by the question: not about refresh frequency"
+    },
+    {
+      "type": "answerable_fact",
+      "candidate": {
+        "question": "If a Corvane employee discovers a stolen laptop, how soon must they report it and what is required before a replacement is issued?",
+        "fact": "extension 4357"
+      },
+      "reason": "fact not required by the question: irrelevant"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What steps and time frame are required to install new software that is not listed in the Company Portal for employees of Corvane Analytics?",
+        "fact": "Software in the Company Portal is pre approved and can be installed at once."
+      },
+      "reason": "fact not required by the question: relevant only to portal software"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What steps and time frame are required to install new software that is not listed in the Company Portal for employees of Corvane Analytics?",
+        "fact": "Software may be installed only from the Company Portal."
+      },
+      "reason": "fact not required by the question: contradicts scenario"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "What steps should I take to report a lost laptop after office hours?",
+        "fact": "A police report is required for stolen devices before a replacement is issued."
+      },
+      "reason": "fact not required by the question: stolen only"
+    },
+    {
+      "type": "cross_doc_fact",
+      "candidate": {
+        "question": "If a major incident affecting more than 25 users is discovered and a malware alert is also detected, how should the incident be reported and what is the reporting timeline?",
+        "fact": "posts updates every 30 minutes"
+      },
+      "reason": "fact not required by the question: not asked about update frequency"
+    },
+    {
+      "type": "out_of_scope",
+      "candidate": "What are the company policies on remote work and flexible hours?",
+      "reason": "a section heading covers it ('6. Remote Work and Networks'); not a valid refusal case"
+    }
+  ]
+}

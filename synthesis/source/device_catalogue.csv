@@ -1,0 +1,16 @@
+item_code,item,category,eligible_roles,price_inr,lead_time_days,approval_level,in_stock
+LAP-STD-14,Standard laptop 14 inch (16 GB RAM),laptop,all employees,68000,5,IT Operations Manager,yes
+LAP-PRF-16,Performance laptop 16 inch (32 GB RAM GPU),laptop,data scientists and engineers,142000,12,Finance,no
+LAP-LGT-13,Lightweight laptop 13 inch (16 GB RAM),laptop,sales and leadership,96000,8,IT Operations Manager,yes
+MON-24-FHD,24 inch Full HD monitor,monitor,all employees,11500,3,reporting manager,yes
+MON-27-QHD,27 inch QHD monitor,monitor,all employees,21000,4,reporting manager,yes
+MON-34-UW,34 inch ultrawide monitor,monitor,data scientists and engineers,39000,10,IT Operations Manager,no
+DCK-USBC,USB-C docking station,accessory,all employees,9800,3,reporting manager,yes
+HDS-ANC,Noise cancelling headset,accessory,all employees,7400,2,reporting manager,yes
+HDS-STD,Standard wired headset,accessory,all employees,1900,1,none (IT counter),yes
+KBM-WL,Wireless keyboard and mouse set,accessory,all employees,2600,1,none (IT counter),yes
+WBC-HD,HD webcam,accessory,all employees,4300,2,reporting manager,yes
+PHN-STD,Standard work phone,phone,sales and on call engineers,32000,7,IT Operations Manager,yes
+SSD-EXT-1T,Encrypted external SSD 1 TB,storage,approved exceptions only,12500,5,Information Security Manager,yes
+BAG-STD,Laptop backpack,accessory,all employees,2400,1,none (IT counter),yes
+LIC-VIS,Data visualisation software licence (annual),software,analysts and data scientists,28000,2,IT Operations Manager,yes

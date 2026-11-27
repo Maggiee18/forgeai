@@ -1,0 +1,10 @@
+{
+  "max_tokens": 600000,
+  "tokens_used": 0,
+  "prompt_tokens": 0,
+  "completion_tokens": 0,
+  "llm_calls": 0,
+  "cached_calls": 237,
+  "elapsed_seconds": 0.6,
+  "by_stage": {}
+}

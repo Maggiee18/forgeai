@@ -1,0 +1,13 @@
+{
+  "tools_kept": [
+    {
+      "name": "csv_lookup",
+      "reason": "documents include CSV data that needs exact row lookups",
+      "evidence": [
+        "documents include CSV data"
+      ],
+      "added_by": "rule"
+    }
+  ],
+  "tools_rejected": []
+}

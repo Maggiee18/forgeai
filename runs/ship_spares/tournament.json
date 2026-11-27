@@ -11,7 +11,7 @@
     {
       "variant": "strict",
       "pass_rate": 1.0,
-      "tokens": 1822,
+      "tokens": 0,
       "prompt_chars": 1832,
       "passed": [
         "ans-04",

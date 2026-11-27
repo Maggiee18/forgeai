@@ -1,7 +1,40 @@
 {
   "agent_version": 1,
   "old_pass_rate": 0.96,
-  "new_pass_rate": 0.96,
+  "replayed": {
+    "pass_rate": 0.96,
+    "broke": [],
+    "newly_passing": []
+  },
+  "regenerated": {
+    "pass_rate": 0.88,
+    "broke": [
+      {
+        "case": "ans-10",
+        "question": "If I receive a gift worth INR 2,500 from a supplier, what must I do within 5 working days?",
+        "verdict": "agent regression: lost the fix the critic loop made in iteration 1",
+        "category": "prompt_defect",
+        "missing_facts": [],
+        "new_answer": "You must declare the gift to the Compliance Officer within 5 working days. It will either be returned or donated."
+      },
+      {
+        "case": "amb-03",
+        "question": "If a grievance isn't solved by the reporting manager, how many working days does the Head of Department have to reply after the grievance is written up?",
+        "verdict": "agent regression: lost the fix the critic loop made in iteration 1",
+        "category": "prompt_defect",
+        "missing_facts": [],
+        "new_answer": "The Head of Department must respond within 7 working days."
+      }
+    ],
+    "lost_critic_fixes": [
+      "ans-10",
+      "amb-03"
+    ],
+    "newly_passing": [],
+    "variant": "strict",
+    "tools_before": [],
+    "tools_after": []
+  },
   "document_changes": [
     {
       "doc": "Leave_Policy_Shore_Staff.pdf",
@@ -46,8 +79,6 @@
       "covered_by": []
     }
   ],
-  "broke": [],
-  "newly_passing": [],
   "guard_flags": [
     "'allowances' is only partly covered by the documents; answers may be incomplete.",
     "'salary band' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",

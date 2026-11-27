@@ -73,4 +73,4 @@ The model refused when the answer was present, or answered something it should h
 - Key facts are short string facts. An answer that is correct but phrased with different numbers formatting (e.g. 'two weeks' vs '14 days') can be marked wrong; check the failure list above for such cases.
 - Out-of-scope cases are only as hard as the generator made them; adversarial prompts (jailbreaks) are not covered.
 - Tool cases are computed exactly in Python, but only the first CSV is sampled.
-- Budget used: 50687 tokens across 52 model calls (99 served from cache), 333.9 s.
+- Budget used: 0 tokens across 0 model calls (151 served from cache), 0.6 s.

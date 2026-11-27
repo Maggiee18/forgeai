@@ -1,0 +1,83 @@
+[
+  {
+    "iteration": 1,
+    "from_version": 0,
+    "to_version": 1,
+    "dev_before": 0.722,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 4
+    },
+    "changes": [
+      {
+        "category": "prompt_defect",
+        "target": "prompt.style",
+        "before": "Friendly yet professional, concise, 2–4 sentences, mention conditions or exceptions. Answers are in plain text, no fluff.",
+        "after": "Friendly yet professional, concise, 2–4 sentences, mention conditions or exceptions. Answers are in plain text, no fluff. Always include every key fact from the retrieved passage. If multiple facts are present, list them in order of appearance. Do not truncate the answer; provide a complete response within the sentence limit.",
+        "rationale": "Ensures all key facts are captured and prevents truncation of important information.",
+        "addressed_cases": [
+          "ans-04",
+          "cro-01",
+          "cro-04",
+          "amb-03"
+        ],
+        "fixed_cases": []
+      },
+      {
+        "category": "wrong_refusal",
+        "target": "prompt.refusal",
+        "before": "Refuse any request for detailed troubleshooting, HR/legal advice, personal data, non‑catalogue items, non‑eligible roles, or external vendor info. Respond with a polite sentence and suggest contacting the Service Desk if a name is provided.",
+        "after": "Refuse any request that requires detailed troubleshooting, HR/legal advice, personal data, non‑catalogue items, non‑eligible roles, or external vendor info. Do not provide policy documents, internal procedures, or location-based answers. Respond politely, suggest contacting the Service Desk if a name is provided, and do not offer any workaround or partial compliance. Do not offer to search for or summarize policy content. Do not provide any information that could be used to bypass security or privacy controls.",
+        "rationale": "Adds explicit prohibition on providing policy documents or location-based answers, preventing under‑refusal of policy‑related queries.",
+        "addressed_cases": [
+          "out-04"
+        ],
+        "fixed_cases": []
+      }
+    ],
+    "newly_broken": [],
+    "newly_fixed": [],
+    "dev_after": 0.722,
+    "holdout_after": 1.0,
+    "decision": "reverted (dev score did not improve)"
+  },
+  {
+    "iteration": 2,
+    "from_version": 0,
+    "to_version": 2,
+    "dev_before": 0.722,
+    "holdout_before": 1.0,
+    "failures_in": {
+      "retrieval_miss": 0,
+      "hallucination": 0,
+      "wrong_refusal": 1,
+      "prompt_defect": 4
+    },
+    "changes": [
+      {
+        "category": "prompt_defect",
+        "target": "-",
+        "skipped": "an earlier fix for this category was reverted; not retrying the same targeted fix",
+        "addressed_cases": [
+          "ans-04",
+          "cro-01",
+          "cro-04",
+          "amb-03"
+        ]
+      },
+      {
+        "category": "wrong_refusal",
+        "target": "-",
+        "skipped": "an earlier fix for this category was reverted; not retrying the same targeted fix",
+        "addressed_cases": [
+          "out-04"
+        ]
+      }
+    ],
+    "decision": "no change",
+    "stop_reason": "optimizer found no applicable targeted fix"
+  }
+]

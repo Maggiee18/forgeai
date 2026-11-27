@@ -135,7 +135,9 @@ def main(argv=None):
     if a.cmd == "regress":
         cfg = _cfg(a)
         out = Factory(cfg, mock_fn=_mock_fn(cfg)).regress(a.old_run, a.docs, a.out)
-        print(json.dumps({k: v for k, v in out.items() if k != "broke"}, indent=2))
+        print(json.dumps({"old_pass_rate": out["old_pass_rate"], "regenerated_pass_rate": out["regenerated"]["pass_rate"],
+                          "replayed_pass_rate": out["replayed"]["pass_rate"], "document_changes": len(out["document_changes"]),
+                          "untested_changes": sum(1 for c in out["document_changes"] if not c["covered_by"])}, indent=2))
         return 0
     return 1
 

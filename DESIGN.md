@@ -50,6 +50,12 @@ supported / partial / unsupported **and must quote the sentence that proves it**
 occur in the passages, the claim is overruled to unsupported. Needs for live data ("live freight rates")
 are checked against the tool registry, not the documents, and computations over document data ("order total
 with discount", "delivery date from lead time") count as supported when a registry tool can perform them.
+The guard also reads the **brief's own wording** for live data cues ("live", "right now", "status of their open
+tickets"): the requirements writer is a small model and can shorten "whether any systems are down right now" to
+"system outage status", which a document about outage procedures then seems to support. A live data request in the
+brief overrules document support for the matching topic, or is added as an unsupported topic if the requirements
+dropped it. Unattended, an assumed intake answer can never grant an integration or live system. (Both found by the
+blind rehearsal, `runs/rehearsal_it_helpdesk_blind`.)
 
 *Contradictions across documents.* Candidate pairs are passages from different documents ranked by embedding
 similarity, shared heading words and word overlap, kept only if they state different values of the same kind
@@ -98,6 +104,10 @@ Known LLM-judge failure modes and the defence for each:
 *Suspected test defects.* When the LLM judge reads an answer as correct but a strict rule rejected it, the case
 stays a failure (the score is not changed) but is flagged as a suspected test defect, listed separately in the
 report, and never sent to the optimizer: changing the agent cannot fix a wrong test, it can only overfit to it.
+Two deterministic signals raise the same flag without the LLM: every missing fact shares no content word with the
+question (the test asks for something the question never asked), or the "fact" is only a document's name or code.
+A refusal case is flagged when the agent answered, grounded, from a section whose heading names the question's topic.
+Numbered list markers ("4.") in an answer are not counted as unsupported numbers.
 
 **6. Critic and optimizer.** The critic is deterministic, using evidence the runtime recorded:
 
@@ -121,9 +131,11 @@ reliability, every remaining failure with its category and diagnosis, eval prove
 generated cases were rejected, and the limitations of the measurement itself.
 
 ## Regression mode
-`forgeai regress` answers "the documents changed; is the agent still right?" It changes exactly one thing: the shipped
-agent definition is replayed unchanged (same prompt, tools, retrieval settings) on the new documents, against the
-original eval set. It also diffs old and new documents sentence by sentence and marks which changes an existing test
+`forgeai regress` answers "the documents changed; is the agent still right?" It re-runs the original eval set on the
+new documents against two agents: the agent the factory **regenerates** from the same requirements (as the brief asks),
+and the shipped definition **replayed** unchanged (same prompt, tools, retrieval settings), which isolates the effect of
+the document change. A regenerated agent starts again at v0, so a break on a case the critic loop had fixed is labelled
+as a lost critic fix. It also diffs old and new documents sentence by sentence and marks which changes an existing test
 covers. A broken test is labelled a *stale test* when its expected facts are gone from the new documents, otherwise an
 *agent regression*. Changes no test covers are listed separately, because a passing replay says nothing about them;
 the remedy is to rebuild the eval set on the new documents.
