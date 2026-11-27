@@ -63,7 +63,19 @@ More in [docs/screenshots](docs/screenshots).
 
 ### Human baseline and regression
 
-<!-- BASELINE -->
+**Human baseline.** I wrote an HR agent definition by hand (`baseline/hr_human_agent.json`, about 25 minutes, without looking at the eval set) and ran it on the same 25 cases with the same agent model, judge and retrieval engine. Full table: [`runs/hr_policy/BASELINE_COMPARISON.md`](runs/hr_policy/BASELINE_COMPARISON.md).
+
+| Metric | Factory agent | Human baseline |
+|---|---|---|
+| Overall pass rate | 96% | 88% |
+| Holdout | 88% | 88% |
+| Fact recall | 100% | 88% |
+| Refusal accuracy | 86% | 100% |
+| Citation precision | 94% | 100% |
+
+The factory agent wins on completeness: it passes three cases (`ans-10`, `cro-01`, `cro-02`) where the human prompt found the right passage but left out a required fact, two of them about the gift declaration threshold. The human prompt is the better refuser: it correctly declines `out-03` (a legal affidavit question) that the factory agent answers. On the holdout split the two are level, so the honest reading is "the factory matches a careful hand-written prompt and is more thorough, but refuses less strictly".
+
+**Regression mode.** `forgeai regress` replays the shipped definition unchanged on a revised document set (`demos/hr_policy/docs_v2`, where the leave policy moves from 21 to 24 days of annual leave, 1.75 to 2 days of accrual, a 10 to 15 day carry forward and 5 to 10 days of paternity leave). The pass rate stays at 96% and no test breaks, but the report shows that none of the six changed sentences is covered by an existing test, so the passing replay proves nothing about them and the eval set has to be rebuilt. See [`runs/hr_policy_regression/REGRESSION.md`](runs/hr_policy_regression/REGRESSION.md). Catching that blind spot, instead of reporting a green 96%, is the point of the mode.
 
 ## How it works
 

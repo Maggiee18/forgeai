@@ -120,6 +120,14 @@ with dev vs holdout, guard flags, tool decisions (kept and rejected with reasons
 reliability, every remaining failure with its category and diagnosis, eval provenance including how many
 generated cases were rejected, and the limitations of the measurement itself.
 
+## Regression mode
+`forgeai regress` answers "the documents changed; is the agent still right?" It changes exactly one thing: the shipped
+agent definition is replayed unchanged (same prompt, tools, retrieval settings) on the new documents, against the
+original eval set. It also diffs old and new documents sentence by sentence and marks which changes an existing test
+covers. A broken test is labelled a *stale test* when its expected facts are gone from the new documents, otherwise an
+*agent regression*. Changes no test covers are listed separately, because a passing replay says nothing about them;
+the remedy is to rebuild the eval set on the new documents.
+
 ## Runtime
 
 `forgeai chat <definition>` (or the web Playground) loads any definition. Per question: hybrid retrieval

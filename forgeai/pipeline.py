@@ -33,7 +33,7 @@ from .optimizer import Optimizer
 from .report import pct, dump, dump_jsonl, final_report, iteration_log_md, scorecard_md
 from .runner import Agent
 from .schemas import AgentDefinition, CaseResult, EvalCase, Requirements
-from .textutil import fact_in_text
+from .textutil import content_overlap, fact_in_text, jaccard, numbers, tokens
 
 
 def _stratified_subset(cases: list[EvalCase], n: int, seed: int) -> list[str]:
@@ -300,8 +300,12 @@ class Factory:
 
     # --------------------------------------------------------------- regression
     def regress(self, old_run: str, new_docs: str, out_dir: str) -> dict:
-        """Documents changed: regenerate the agent from the SAME requirements, replay the OLD eval set,
-        and separate genuine regressions from eval cases the new documents made stale."""
+        """Documents changed. Change ONE thing: replay the SHIPPED agent definition (same prompt, tools and retrieval
+        settings) against the new documents on the OLD eval set. Then (1) diff old vs new documents sentence by
+        sentence, (2) mark which changed sentences an existing test covers, and (3) separate genuine agent
+        regressions from tests the new documents made stale."""
+        import re as _re
+
         cfg, log = self.cfg, self.log
         old = Path(old_run)
         run = Path(out_dir)
@@ -309,42 +313,85 @@ class Factory:
         budget = Budget(max_tokens=cfg.max_tokens)
         factory_llm, agent_llm, judge_llm = self._clients(run, budget)
         req = Requirements.model_validate_json((old / "requirements.json").read_text(encoding="utf-8"))
-        old_def = AgentDefinition.model_validate_json((old / "agent_definition.json").read_text(encoding="utf-8"))
+        shipped = AgentDefinition.model_validate_json((old / "agent_definition.json").read_text(encoding="utf-8"))
+        old_folder = (old / shipped.docs_folder).resolve()
         cases = [EvalCase.model_validate_json(l) for l in (old / "evalset.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
         old_res = {r.case_id: r for r in (CaseResult.model_validate_json(l) for l in (old / "final_results.jsonl").read_text(encoding="utf-8").splitlines() if l.strip())}
-        docs = load_folder(new_docs)
-        log(f"\n=== Regression: {old_def.name} on changed documents ({len(docs)} files)")
+        old_docs, docs = load_folder(old_folder), load_folder(new_docs)
+        log(f"\n=== Regression: {shipped.name} v{shipped.version} replayed on changed documents ({len(docs)} files)")
+
+        # 1. what changed in the documents
+        def sents(d):
+            # join wrapped lines first: a PDF re-flowing its lines is not a content change
+            flat = " ".join(d.text.split())
+            return [x.strip() for x in _re.split(r"(?<=[.!?])\s+", flat) if len(x.split()) >= 4]
+        by_name_old = {d.doc_id: d for d in old_docs}
+        changes = []
+        for d in docs:
+            o = by_name_old.get(d.doc_id)
+            if o is None:
+                changes.append({"doc": d.doc_id, "kind": "new document", "old": "", "new": f"{len(d.text.split())} words"})
+                continue
+            old_s, new_s = sents(o), sents(d)
+            removed = [x for x in old_s if x not in new_s]
+            added = [x for x in new_s if x not in old_s]
+            for r_ in removed:
+                partner = max(added, key=lambda a: jaccard(a, r_), default="")
+                if partner and jaccard(partner, r_) >= 0.5:
+                    changes.append({"doc": d.doc_id, "kind": "changed", "old": r_, "new": partner})
+                    added.remove(partner)
+                else:
+                    changes.append({"doc": d.doc_id, "kind": "removed", "old": r_, "new": ""})
+            changes += [{"doc": d.doc_id, "kind": "added", "old": "", "new": a} for a in added]
+        for name in set(by_name_old) - {d.doc_id for d in docs}:
+            changes.append({"doc": name, "kind": "document removed", "old": name, "new": ""})
+        # 2. which changes an existing test covers (its evidence or facts touch the changed sentence)
+        for ch in changes:
+            text = ch["old"] or ch["new"]
+            # strict on purpose: claiming a change is tested when it is not is the dangerous direction
+            ch["covered_by"] = [c.id for c in cases if ch["doc"] in c.expected_sources and (
+                any(e.get("doc") == ch["doc"] and jaccard(e.get("quote", ""), text) >= 0.5 for e in c.evidence)
+                or any(numbers(f) <= numbers(text) and content_overlap(f, text) >= 0.8 and len(tokens(f)) >= 3 for f in c.key_facts))]
+        log(f"    {len(changes)} sentence level change(s); {sum(1 for c in changes if not c['covered_by'])} not covered by any existing test")
+
+        # 3. replay the shipped definition on the new documents
         req = run_guard(req, docs, factory_llm, log, verifier=self._guard_client(run, budget, judge_llm))
-        rel_docs = os.path.relpath(Path(new_docs).resolve(), run.resolve())
-        new_def, meta = generator.generate(req, docs, rel_docs, factory_llm, cfg.tools_enabled, variant=old_def.provenance.get("variant", "strict"), tools=old_def.tools, embedding=cfg.embedding)
-        new_def.retrieval = {**new_def.retrieval, **{k: old_def.retrieval[k] for k in ("top_k", "min_score", "query_expansion", "bm25_weight", "dense_weight") if k in old_def.retrieval}}
-        new_def.name = old_def.name
-        dump(run / "agent_definition.json", new_def)
+        replay = shipped.model_copy(deep=True)
+        replay.docs_folder = os.path.relpath(Path(new_docs).resolve(), run.resolve())
+        dump(run / "agent_definition.json", replay)
         judge = Judge(judge_llm, use_llm=True, seed=cfg.seed)
-        res = run_evals(Agent(new_def, agent_llm, docs=docs), cases, judge, log=log)
+        res = run_evals(Agent(replay, agent_llm, docs=docs), cases, judge, log=log)
         corpus = " ".join(d.text for d in docs)
         rows = []
         for r in res:
             was = old_res.get(r.case_id)
             if was and was.passed and not r.passed:
                 case = next(c for c in cases if c.id == r.case_id)
-                still = all(fact_in_text(f, corpus) for f in case.key_facts) if case.key_facts else True
-                kind = "agent regression (facts still in documents)" if still else "stale eval: expected facts no longer in documents (policy changed)"
-                rows.append({"case": r.case_id, "question": r.question, "verdict": kind, "missing_facts": [f for f in case.key_facts if not fact_in_text(f, corpus)], "new_answer": r.answer[:300]})
+                gone = [f for f in case.key_facts if not fact_in_text(f, corpus)]
+                kind = "stale test: expected facts no longer in documents (policy changed)" if gone else "agent regression (facts still in documents)"
+                rows.append({"case": r.case_id, "question": r.question, "verdict": kind, "missing_facts": gone, "new_answer": r.answer[:300]})
         fixed = [r.case_id for r in res if r.passed and old_res.get(r.case_id) and not old_res[r.case_id].passed]
-        sc = scorecard(res)
-        old_sc = scorecard(list(old_res.values()))
+        sc, old_sc = scorecard(res), scorecard(list(old_res.values()))
         dump_jsonl(run / "regression_results.jsonl", res)
-        out = {"old_pass_rate": old_sc["pass_rate"], "new_pass_rate": sc["pass_rate"], "broke": rows, "newly_passing": fixed, "guard_flags": req.flags}
+        out = {"agent_version": shipped.version, "old_pass_rate": old_sc["pass_rate"], "new_pass_rate": sc["pass_rate"], "document_changes": changes,
+               "broke": rows, "newly_passing": fixed, "guard_flags": req.flags}
         dump(run / "regression.json", out)
-        L = [f"# Regression report: {old_def.name}", "", f"Old documents: pass rate {old_sc['pass_rate']:.0%} · New documents: {sc['pass_rate']:.0%} on the same {len(cases)} cases.", ""]
-        L += ["## Cases that broke", "", "| Case | Question | Verdict | Facts gone from docs |", "|---|---|---|---|"]
-        for x in rows:
-            L.append(f"| {x['case']} | {x['question'][:80]} | {x['verdict']} | {', '.join(x['missing_facts']) or '-'} |")
-        if not rows:
-            L.append("| - | none | - | - |")
-        L += ["", f"Newly passing: {', '.join(fixed) or 'none'}", "", "## Guard flags on the new documents"] + [f"- {f}" for f in req.flags]
-        L += ["", "Stale cases should be regenerated (run `forgeai build` again); agent regressions are real defects."]
+        uncovered = [c for c in changes if not c["covered_by"]]
+        L = [f"# Regression report: {shipped.name} v{shipped.version}", "",
+             f"The shipped agent definition was replayed unchanged (same prompt, tools and retrieval settings) on the new documents, against the original {len(cases)} test cases.", "",
+             f"**Pass rate: {old_sc['pass_rate']:.0%} on the old documents → {sc['pass_rate']:.0%} on the new documents.**", "",
+             f"## What changed in the documents ({len(changes)} sentence level changes)", "", "| Document | Change | Before | After | Covered by existing tests |", "|---|---|---|---|---|"]
+        for c in changes:
+            L.append(f"| {c['doc']} | {c['kind']} | {c['old'][:110]} | {c['new'][:110]} | {', '.join(c['covered_by']) or '**none**'} |")
+        L += ["", "## Tests that broke", "", "| Case | Question | Verdict | Facts gone from the documents |", "|---|---|---|---|"]
+        L += [f"| {x['case']} | {x['question'][:80]} | {x['verdict']} | {', '.join(x['missing_facts']) or '-'} |" for x in rows] or ["| - | none | - | - |"]
+        L += ["", f"Newly passing: {', '.join(fixed) or 'none'}", ""]
+        if uncovered:
+            L += [f"## ⚠ {len(uncovered)} change(s) no existing test covers", "",
+                  "A passing replay says nothing about these. Rebuild the eval set (`forgeai build` on the new documents) so the changed rules are tested:", ""]
+            L += [f"- {c['doc']}: \"{(c['new'] or c['old'])[:140]}\"" for c in uncovered] + [""]
+        L += ["## Guard flags on the new documents"] + [f"- {f}" for f in req.flags]
+        L += ["", "Stale tests should be regenerated; agent regressions are real defects."]
         (run / "REGRESSION.md").write_text("\n".join(L), encoding="utf-8")
-        log(f"    {len(rows)} previously passing cases broke; report at {run/'REGRESSION.md'}")
+        log(f"    {len(rows)} previously passing case(s) broke; {len(uncovered)} document change(s) untested; report at {run/'REGRESSION.md'}")
         return out

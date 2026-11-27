@@ -1,0 +1,57 @@
+{
+  "agent_version": 1,
+  "old_pass_rate": 0.96,
+  "new_pass_rate": 0.96,
+  "document_changes": [
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Leave Policy: Shore Staff Meridian Shipmanagement Pvt Ltd | Document HR-POL-03 | Edition 2026 1.",
+      "new": "Leave Policy: Shore Staff Meridian Shipmanagement Pvt Ltd | Document HR-POL-03 | Edition 2027 1.",
+      "covered_by": []
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Annual Leave Every confirmed employee is entitled to 21 days of annual leave per leave year.",
+      "new": "Annual Leave Every confirmed employee is entitled to 24 days of annual leave per leave year.",
+      "covered_by": []
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Annual leave accrues at 1.75 days for each completed month of service.",
+      "new": "Annual leave accrues at 2 days for each completed month of service.",
+      "covered_by": []
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Carry Forward and Encashment Unused annual leave of up to 10 days may be carried forward into the next leave year.",
+      "new": "Carry Forward and Encashment Unused annual leave of up to 15 days may be carried forward into the next leave year.",
+      "covered_by": []
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Any balance above 10 days lapses on 31 December.",
+      "new": "Any balance above 15 days lapses on 31 December.",
+      "covered_by": []
+    },
+    {
+      "doc": "Leave_Policy_Shore_Staff.pdf",
+      "kind": "changed",
+      "old": "Paternity Leave Male employees are entitled to 5 working days of paid paternity leave, to be taken within 3 months of the birth or adoption of a child.",
+      "new": "Paternity Leave Male employees are entitled to 10 working days of paid paternity leave, to be taken within 3 months of the birth or adoption of a child.",
+      "covered_by": []
+    }
+  ],
+  "broke": [],
+  "newly_passing": [],
+  "guard_flags": [
+    "'allowances' is only partly covered by the documents; answers may be incomplete.",
+    "'salary band' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "'payroll dates' is requested by the brief but the documents do not support it. The agent will state that the documents do not cover it instead of answering.",
+    "Conflicting information on Maximum value of retainable gifts from clients/agents: Code_of_Conduct_and_Grievance.pdf says \"Employees may accept gifts or hospitality from suppliers, agents or clients only if the value is below INR 2,000 per occasion.\" while Travel_and_Expense_Policy.pdf says \"Gifts received from clients or agents during an official trip may be retained if their value does not exceed INR 5,000.\". The agent will present both and suggest confirming with the document owner."
+  ]
+}

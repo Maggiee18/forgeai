@@ -386,3 +386,17 @@ def test_shorthand_thousands_are_the_same_number():
     from forgeai.textutil import numbers
 
     assert numbers("thresholds 15k and 2.5k") == numbers("USD 15,000 and USD 2,500")
+
+
+def test_regression_replays_shipped_agent_and_finds_document_changes(tmp_path, monkeypatch):
+    monkeypatch.setenv("FORGE_CACHE", str(tmp_path / "cache"))
+    cfg = Config(backend="mock", model="mock", interactive=False, answers_file=str(ROOT / "demos/hr_policy/answers.yaml"), max_iterations=1, tournament=False)
+    f = Factory(cfg, mock_fn=mock_llm, log=lambda *a: None)
+    f.build(str(ROOT / "demos/hr_policy/brief.txt"), str(ROOT / "demos/hr_policy/docs"), str(tmp_path / "hr"))
+    shipped = json.loads((tmp_path / "hr" / "agent_definition.json").read_text())
+    out = f.regress(str(tmp_path / "hr"), str(ROOT / "demos/hr_policy/docs_v2"), str(tmp_path / "reg"))
+    replay = json.loads((tmp_path / "reg" / "agent_definition.json").read_text())
+    assert replay["system_prompt_sections"] == shipped["system_prompt_sections"] and replay["version"] == shipped["version"]
+    changed = " ".join(c["old"] + " " + c["new"] for c in out["document_changes"])
+    assert "21 days of annual leave" in changed and "24 days of annual leave" in changed
+    assert "Uncovered" in (tmp_path / "reg" / "REGRESSION.md").read_text() or "no existing test covers" in (tmp_path / "reg" / "REGRESSION.md").read_text() or all(c["covered_by"] for c in out["document_changes"])
