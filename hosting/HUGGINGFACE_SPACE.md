@@ -4,7 +4,7 @@ ForgeAI ships as one Docker image: FastAPI serves the API and the built React da
 
 1. Create a Space at huggingface.co/new-space: SDK **Docker**, template **Blank**, hardware **CPU basic (free)**.
 2. Push this repository to the Space (or add the Space as a git remote and `git push space main`).
-3. Make sure the Space's `README.md` starts with this front matter (the repository's own README already does):
+3. Make sure the Space's `README.md` starts with this front matter (the GitHub README leaves it out, since the hosted demo runs on Render; add it only in the Space copy):
 
 ```yaml
 ---

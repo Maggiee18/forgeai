@@ -1,13 +1,3 @@
----
-title: ForgeAI
-emoji: 🛠️
-colorFrom: gray
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # ForgeAI: the agent that builds agents
 
 Give ForgeAI a one paragraph brief and a folder of documents. It interviews you, checks whether the documents can
